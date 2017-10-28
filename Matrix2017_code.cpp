@@ -171,7 +171,7 @@ string Matrix::getString()
 		for (int iC = 0; iC<nColumns; iC++)
 		{
 			cout << values[iR][iC] << " ";
-			
+
 			char buffer[50];
 			//sprintf_s(buffer, 50, "%g\t", values[iR][iC]);
 			s += buffer;
@@ -327,22 +327,44 @@ double Matrix::getDeterminant()
 		throw("Invalid matrix dimension");
 	if (nRows == 1 && nColumns == 1)return values[0][0];
 	double value = 0, m = 1;
-	for (int iR = 0;iR<nRows;iR++) 
-	{ 
+	for (int iR = 0;iR<nRows;iR++)
+	{
 		value += m * values[0][iR] * getCofactor(0, iR).getDeterminant();
-	m *= -1; 
+	m *= -1;
 	}
 	return value;
 }
 
 istream& operator >> (istream &is, Matrix& m)
-{ 
+{
 	string s;getline(is, s, ']');s += "]";
 	m = Matrix(s);return is;
 }
 ostream& operator << (ostream &os, Matrix& m)
-{ 
+{
 	os << m.getString();
-	return os; 
+	return os;
 }
-
+Matrix Matrix::getInverse()//inverse=(1/determinant)*transpose of cofactor matrix
+{
+    if(nRows!=nColumns)//inverse can only be done on square matrices
+        throw("Invalid Matrix Dimension");
+  Matrix n(nRows,nColumns);// copy matrix
+  for (int iR = 0;iR<n.nRows;iR++)
+		for (int iC = 0;iC<n.nColumns;iC++)
+		{
+		    n.values[iR][iC]=values[iR][iC];
+		}
+  double det_value=n.getDeterminant();//determinant value of the matrix
+  Matrix m(nRows,nColumns);//cofactor matrix
+  int sign=1;
+  for (int iR = 0;iR<m.nRows;iR++)
+    for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=sign*n.getCofactor(iR,iC).getDeterminant();//getting detreminant values of cofactor matrix
+		    sign*=-1;//following sign rule in matrices
+		}
+     m.getTranspose();//transpose of cofactor matrix
+     m*=(1/det_value);
+     return m;
+}
