@@ -96,7 +96,7 @@ Matrix::Matrix(double d)
 	copy(d);
 }
 
-void Matrix::copy(Matrix& m)
+void Matrix::copy(const Matrix& m)
 {
 	reset();
 	this->nRows = m.nRows;
@@ -131,22 +131,37 @@ void Matrix::copy(string s)
 {
 	reset();
 	char* buffer = new char[s.length() + 1];
-	strcpy_s(buffer, s.length() + 1, s.c_str());
-	char* lineContext;
-	char* lineSeparators = ";\r\n";
-	char* line = strtok_s(buffer, lineSeparators, &lineContext);
+    //strcpy_s(buffer, s.length() + 1, s.c_str());
+	strncpy(buffer, s.c_str(), s.length() + 1);
+	//char* lineContext;
+	const char* lineSeparators = ";\r\n";
+	//char* line = strtok_s(buffer, lineSeparators, &lineContext);
+   // char* line = strtok_s(buffer, lineSeparators, &lineContext);
+     char* line = strtok(buffer, lineSeparators);
+     char* Remainlines = strtok(NULL, "");
 	while (line)
 	{
-		Matrix row; char* context;char* separators = " []";
-		char* token = strtok_s(line, separators, &context);
+		Matrix row;
+       // char* context;
+        const char* separators = " []";
+		//char* token = strtok_s(line, separators, &context);
+		char* token = strtok(line, separators);
+
 		while (token)
 		{
-			Matrix item = atof(token);
+		    const double token_value=atof(token);
+			Matrix item;
+            item = (const double)token_value;
 			row.addColumn(item);
-			token = strtok_s(NULL, separators, &context);
+			token = strtok(NULL, separators);
+
 		}
 		if (row.nColumns>0 && (row.nColumns == nColumns || nRows == 0))
-			addRow(row);line = strtok_s(NULL, lineSeparators, &lineContext);
+			addRow(row);
+
+        line = strtok(Remainlines, lineSeparators);
+        Remainlines = strtok(NULL, "");
+			//addRow(row);line = strtok_s(NULL, lineSeparators, &lineContext);
 	}
 	delete[] buffer;
 }
@@ -173,7 +188,7 @@ string Matrix::getString()
 			//cout << values[iR][iC] << " ";
 
 			char buffer[50]="";
-			sprintf_s(buffer, 50, "%g\t", values[iR][iC]);
+			snprintf(buffer, 50, "%g\t", values[iR][iC]);
 			s += buffer;
 		}
 		//cout << endl;
@@ -182,16 +197,16 @@ string Matrix::getString()
 	return s;
 }
 
-Matrix Matrix::operator=(Matrix& m)
+Matrix Matrix::operator=(const Matrix& m)
 {
 	copy(m);
 	return *this;
 }
 
-Matrix Matrix::operator=(double d) { copy(d);return *this; }
+Matrix Matrix::operator=(const double d) { copy(d);return *this; }
 Matrix Matrix::operator=(string s) { copy(s);return *this; }
 
-void Matrix::add(Matrix& m)
+void Matrix::add(const Matrix& m)
 {
 	if (nRows != m.nRows || nColumns != m.nColumns)
 		throw("Invalid matrix dimension");
@@ -206,7 +221,7 @@ void Matrix::operator+=(double d) { add(Matrix(nRows, nColumns, MI_VALUE, d)); }
 Matrix Matrix::operator+(Matrix& m) { Matrix r = *this;r += m;return r; }
 Matrix Matrix::operator+(double d) { Matrix r = *this;r += d;return r; }
 
-void Matrix::sub(Matrix& m)
+void Matrix::sub(const Matrix& m)
 {
 	if (nRows != m.nRows || nColumns != m.nColumns)
 		throw("Invalid matrix dimension");
@@ -242,6 +257,14 @@ void Matrix::mul(Matrix& m)
 	copy(r);
 }
 
+
+void Matrix::operator%=(const Matrix& m)
+	{
+
+	}
+
+
+
 void Matrix::operator*=(Matrix& m) { mul(m); }
 void Matrix::operator*=(double d)
 {
@@ -256,8 +279,9 @@ Matrix Matrix::operator*(double d) { Matrix r = *this;	r *= d;	return r; }
 Matrix Matrix::operator/(Matrix& m) //C = A/B where C, A and B are all matrices
 {
 	Matrix r = *this;
-	r = r.div(m);
-	return r;
+	Matrix ret;
+	ret = r.div(m);
+    return ret;
 }
 
 Matrix Matrix::operator/(double d) //C = A/B where C, A are matrices and B is a double
@@ -271,7 +295,7 @@ Matrix Matrix::operator/(double d) //C = A/B where C, A are matrices and B is a 
 
 void Matrix::operator/=(Matrix& m) // Divides by m and stores the result in the calling function
 {
-	div(m);
+	*this = div(m);
 }
 
 void Matrix::operator/=(double d) // Divides by d (element wise) and stores the result in the calling function
@@ -281,14 +305,15 @@ void Matrix::operator/=(double d) // Divides by d (element wise) and stores the 
 			values[iR][iC] /= d;
 }
 
-Matrix Matrix::div(Matrix m)//div C = A/B = A * B.getInverse();
+Matrix Matrix::div(Matrix& m)//div C = A/B = A * B.getInverse();
 {
+	Matrix r = *this;
 	if (nColumns != m.nRows)
 		throw("First matrix must have the same number of columns as the rows in the second matrix.");
-	Matrix t = m.getInverse(); // get the inverse of B
-	Matrix r = *this;
+	Matrix t ;
+	t= m.getInverse(); // get the inverse of B
 	r *= t;
-	return r; // return r the result of the division process
+	return r;
 }
 
 Matrix Matrix::operator++() { add(Matrix(nRows, nColumns, MI_VALUE, 1.0));return *this; }
@@ -382,12 +407,12 @@ istream& operator >> (istream &is, Matrix& m) //inputs the matrix through "cin>>
 	string s;
 	getline(is, s, ']'); //] is the delimiter at which the getline knows this is the end of the string
 	s += "]"; //because it wasn't saved in the actual string and the constructor uses it
-	m = Matrix(s); //uses the constructor which takes an input string
+	m = Matrix( s); //uses the constructor which takes an input string
 	return is;
 }
 ostream& operator << (ostream &os, Matrix& m) //prints out the matrix elements using "cout<<"
 {
-	os << m.getString(); 
+	os << m.getString();
 	return os;
 }
 
