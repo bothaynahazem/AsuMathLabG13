@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class Matrix 
+class Matrix
 {
 	int nRows, nColumns;
 	double** values;
@@ -31,7 +31,8 @@ public:
 	void copy(string s);
 
 	void reset();
-	
+	//void setMatrix(int nRows, int nColumns, );
+
 	string getString();
 
 	/*operations*/
@@ -56,39 +57,39 @@ public:
 	void operator-=(double d);
 	Matrix operator-(Matrix& m);
 	Matrix operator-(double d);
-	
+
 	void operator*=(Matrix& m);
 	void operator*=(double d);
 	Matrix operator*(Matrix& m);
 	Matrix operator*(double d);
-	
+
 	void operator/=(Matrix& m);
 	void operator/=(double d);
 	Matrix operator/(Matrix& m);
 	Matrix operator/(double d);
-	
+
 	Matrix operator++(); //Pre InColumnsrement
 	Matrix operator++(int);//Post InColumnsrement, int is not used
 	Matrix operator--(); //Pre InColumnsrement
 	Matrix operator--(int); //Post InColumnsrement, int is not used
-	
+
 	friend istream& operator >> (istream &is, Matrix& C); //Stream
 	friend ostream& operator << (ostream &os, Matrix& C); //Stream
-	
+
 	void setSubMatrix(int iR, int iC, Matrix& m);
 	Matrix getSubMatrix(int r, int c, int nRows, int nColumns);
 	Matrix getCofactor(int r, int c);
-	
+
 	void addColumn(Matrix& m);
 	void addRow(Matrix& m);
-	
+
 	double& operator[](int i)
 	{
-		return values[i/nColumns][i%nColumns];
+		return values[i / nColumns][i%nColumns];
 	}
 	double& operator()(int i)
 	{
-		return values[i/nColumns][i%nColumns];
+		return values[i / nColumns][i%nColumns];
 	}
 	double& operator()(int r, int c)
 	{
@@ -109,6 +110,6 @@ public:
 	};
 
 	double getDeterminant();
-	double getTranspose();
-	double getInverse();
+	Matrix getTranspose();
+	Matrix getInverse();
 };
