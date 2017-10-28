@@ -165,18 +165,18 @@ void Matrix::reset()
 
 string Matrix::getString()
 {
-	string s;
+	string s="";
 	for (int iR = 0; iR<nRows; iR++)
 	{
 		for (int iC = 0; iC<nColumns; iC++)
 		{
-			cout << values[iR][iC] << " ";
+			//cout << values[iR][iC] << " ";
 
-			char buffer[50];
-			//sprintf_s(buffer, 50, "%g\t", values[iR][iC]);
+			char buffer[50]="";
+			sprintf_s(buffer, 50, "%g\t", values[iR][iC]);
 			s += buffer;
 		}
-		cout << endl;
+		//cout << endl;
 		s += "\n";
 	}
 	return s;
@@ -224,15 +224,18 @@ Matrix Matrix::operator-(double d) { Matrix r = *this;r -= d;return r; }
 
 void Matrix::mul(Matrix& m)
 {
-	if (nRows != m.nRows || nColumns != m.nColumns)
-		throw("Invalid matrix dimension");
-	Matrix r(nRows, m.nColumns);
-	for (int iR = 0;iR<r.nRows;iR++)
+	if (nColumns != m.nRows) //that's how matrices are multiplied
+		throw("Invalid matrix dimension for multiplication");
+
+	Matrix r(nRows, m.nColumns); //the dim of the product matrix
+
+	for (int iR = 0; iR<r.nRows; iR++)
 	{
-		for (int iC = 0;iC < r.nColumns;iC++)
+		for (int iC = 0; iC < r.nColumns; iC++)
 		{
-			r.values[iR][iC] = 0;
-			for (int k = 0;k < m.nColumns;k++)
+			r.values[iR][iC] = 0; //initializing this particular element of the matrix with zero
+
+			for (int k = 0; k < m.nColumns; k++)
 				r.values[iR][iC] += values[iR][k] * m.values[k][iC];
 		}
 	}
@@ -246,8 +249,47 @@ void Matrix::operator*=(double d)
 		for (int iC = 0;iC<nColumns;iC++)
 			values[iR][iC] *= d;
 }
-Matrix Matrix::operator*(Matrix& m) { Matrix r = *this;r *= m;return r; }
-Matrix Matrix::operator*(double d) { Matrix r = *this;r *= d;return r; }
+Matrix Matrix::operator*(Matrix& m) { Matrix r = *this;	r *= m;	return r; }
+Matrix Matrix::operator*(double d) { Matrix r = *this;	r *= d;	return r; }
+
+
+Matrix Matrix::operator/(Matrix& m) //C = A/B where C, A and B are all matrices
+{
+	Matrix r = *this;
+	r = r.div(m);
+	return r;
+}
+
+Matrix Matrix::operator/(double d) //C = A/B where C, A are matrices and B is a double
+{
+	Matrix r = *this;
+	for (int iR = 0; iR<r.nRows; iR++)
+		for (int iC = 0; iC<r.nColumns; iC++)
+			r.values[iR][iC] /= d;
+	return r;
+}
+
+void Matrix::operator/=(Matrix& m) // Divides by m and stores the result in the calling function
+{
+	div(m);
+}
+
+void Matrix::operator/=(double d) // Divides by d (element wise) and stores the result in the calling function
+{
+	for (int iR = 0; iR<nRows; iR++)
+		for (int iC = 0; iC<nColumns; iC++)
+			values[iR][iC] /= d;
+}
+
+Matrix Matrix::div(Matrix m)//div C = A/B = A * B.getInverse();
+{
+	if (nColumns != m.nRows)
+		throw("First matrix must have the same number of columns as the rows in the second matrix.");
+	Matrix t = m.getInverse(); // get the inverse of B
+	Matrix r = *this;
+	r *= t;
+	return r; // return r the result of the division process
+}
 
 Matrix Matrix::operator++() { add(Matrix(nRows, nColumns, MI_VALUE, 1.0));return *this; }
 
@@ -335,16 +377,20 @@ double Matrix::getDeterminant()
 	return value;
 }
 
-istream& operator >> (istream &is, Matrix& m)
+istream& operator >> (istream &is, Matrix& m) //inputs the matrix through "cin>>" example: Matrix myMatrix; cin>>myMatrix;
 {
-	string s;getline(is, s, ']');s += "]";
-	m = Matrix(s);return is;
+	string s;
+	getline(is, s, ']'); //] is the delimiter at which the getline knows this is the end of the string
+	s += "]"; //because it wasn't saved in the actual string and the constructor uses it
+	m = Matrix(s); //uses the constructor which takes an input string
+	return is;
 }
-ostream& operator << (ostream &os, Matrix& m)
+ostream& operator << (ostream &os, Matrix& m) //prints out the matrix elements using "cout<<"
 {
-	os << m.getString();
+	os << m.getString(); 
 	return os;
 }
+
 Matrix Matrix::getInverse()//inverse=(1/determinant)*transpose of cofactor matrix
 {
 	if (nRows != nColumns)//inverse can only be done on square matrices
@@ -356,15 +402,38 @@ Matrix Matrix::getInverse()//inverse=(1/determinant)*transpose of cofactor matri
 			n.values[iR][iC] = values[iR][iC];
 		}
 	double det_value = n.getDeterminant();//determinant value of the matrix
+
 	Matrix m(nRows, nColumns);//cofactor matrix
 	int sign = 1;
+
 	for (int iR = 0;iR<m.nRows;iR++)
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
 			m.values[iR][iC] = sign*n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
 			sign *= -1;//following sign rule in matrices
 		}
+
 	m.getTranspose();//transpose of cofactor matrix
 	m *= (1 / det_value);
 	return m;
 }
+
+
+Matrix Matrix::getTranspose() {
+	Matrix x(nColumns, nRows);
+	for (int ir = 0; ir<x.nRows;ir++) {
+		for (int ic = 0; ic<x.nColumns;ic++) {
+			x.values[ir][ic] = values[ic][ir];
+		}
+	}
+	return x;
+}
+
+
+
+//void mul_dot_astrisk(Matrix& m)
+//{
+//	if (nRows != m.nRows || nColumns != m.nColumns)
+//		throw("Invalid matrix dimension");
+//
+//}
