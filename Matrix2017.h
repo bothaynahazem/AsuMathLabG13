@@ -2,7 +2,12 @@
 #include <string>
 #include <math.h>
 #include <fstream>
+#include <cstdlib>
+#include <cstring>
+#include <string.h>
+#include <stdio.h>
 #include "stdarg.h"
+
 
 using namespace std;
 
@@ -22,27 +27,28 @@ public:
 	Matrix(int nRows, int nColumns, double first, ...);
 	Matrix(Matrix& m);
 	Matrix(double d);
-	Matrix(string s);
+	Matrix(const string s);
 
 	/*copy functions*/
-	void copy(Matrix& m);
-	void copy(double d);
-	void copy(string s);
+	void copy(const Matrix& m);
+	void copy(const double d);
+	void copy(const string s);
 
 	void reset();
 
 	string getString();
 
 	/*operations*/
-	void add(Matrix& m);
-	void sub(Matrix& m);
+	void add(const Matrix& m);
+	void sub(const Matrix& m);
 	void mul(Matrix& m);
 	//void div(Matrix& m);
 
 	/*operators*/
-	Matrix operator=(Matrix& m);
-	Matrix operator=(double d);
-	Matrix operator=(string s);
+	void operator%=(const Matrix& m);
+	Matrix operator=(const Matrix& m);
+	Matrix operator=(const double d);
+	Matrix operator=(const string s);
 
 	void operator+=(Matrix& m);
 	void operator+=(double d);
@@ -110,5 +116,5 @@ public:
 	double getDeterminant();
 	Matrix getTranspose();
 	Matrix getInverse();
-	Matrix div(Matrix m);
+	Matrix div(Matrix &m);
 };
