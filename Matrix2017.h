@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>
 #include <string>
 #include <math.h>
@@ -25,13 +24,12 @@ public:
 	Matrix(double d);
 	Matrix(string s);
 
-	/*copy funColumnstions*/
+	/*copy functions*/
 	void copy(Matrix& m);
 	void copy(double d);
 	void copy(string s);
 
 	void reset();
-	//void setMatrix(int nRows, int nColumns, );
 
 	string getString();
 
@@ -39,7 +37,7 @@ public:
 	void add(Matrix& m);
 	void sub(Matrix& m);
 	void mul(Matrix& m);
-	void div(Matrix& m);
+	//void div(Matrix& m);
 
 	/*operators*/
 	Matrix operator=(Matrix& m);
@@ -112,4 +110,5 @@ public:
 	double getDeterminant();
 	Matrix getTranspose();
 	Matrix getInverse();
+	Matrix div(Matrix m);
 };
