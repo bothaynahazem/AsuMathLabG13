@@ -320,7 +320,16 @@ Matrix Matrix::operator++() { add(Matrix(nRows, nColumns, MI_VALUE, 1.0));return
 
 Matrix Matrix::operator++(int) { Matrix C = *this;add(Matrix(nRows, nColumns, MI_VALUE, 1.0));return C; }
 Matrix Matrix::operator--() { add(Matrix(nRows, nColumns, MI_VALUE, -1.0));return *this; }
-Matrix Matrix::operator--(int) { Matrix r = *this;add(Matrix(nRows, nColumns, MI_VALUE, -1.0));return r; }
+
+//add (-1) to each element of the matrix, then return the matrix.
+Matrix Matrix::operator--(int) //int is not used.
+{
+	Matrix r = *this;
+	add(Matrix(nRows, nColumns, MI_VALUE, -1.0));
+	return r; 
+}
+
+//return the same matrix multiplied by a negative sign for each element.
 Matrix Matrix::operator-()
 {
 	for (int iR = 0;iR < nRows;iR++)
@@ -331,8 +340,10 @@ Matrix Matrix::operator-()
 	return *this;
 }
 
+//return the same matrix.
 Matrix Matrix::operator+() { return *this; }
 
+//copy a submatrix (m) into a matrix, r & c are row & columns where we want to copy.
 void Matrix::setSubMatrix(int r, int c, Matrix& m)
 {
 	if ((r + m.nRows)>nRows || (c + m.nColumns)>nColumns)
@@ -342,6 +353,7 @@ void Matrix::setSubMatrix(int r, int c, Matrix& m)
 			values[r + iR][c + iC] = m.values[iR][iC];
 }
 
+//extract a submatrix from matrix, r & c are row & column where we want to extract. nRows & nColumns are the rows & columns of the submatrix.
 Matrix Matrix::getSubMatrix(int r, int c, int nRows, int nColumns)
 {
 	if ((r + nRows)>nRows || (c + nColumns)>nColumns)
@@ -357,6 +369,8 @@ Matrix Matrix::getSubMatrix(int r, int c, int nRows, int nColumns)
 {
 
 }*/
+
+//add column to matrix (m).
 void Matrix::addColumn(Matrix& m)
 {
 	Matrix n(max(nRows, m.nRows), nColumns + m.nColumns);
@@ -365,6 +379,7 @@ void Matrix::addColumn(Matrix& m)
 	*this = n;
 }
 
+//add row to matrix (m).
 void Matrix::addRow(Matrix& m)
 {
 	Matrix n(nRows + m.nRows, max(nColumns, m.nColumns));
@@ -373,8 +388,10 @@ void Matrix::addRow(Matrix& m)
 	*this = n;
 }
 
+//return cofactor matrix, r & c are element's row & column which we want to get its cofactor.
 Matrix Matrix::getCofactor(int r, int c)
 {
+	//valid only for (2*2) matrices.
 	if (nRows <= 1 && nColumns <= 1)
 		throw("Invalid matrix dimension");
 	Matrix m(nRows - 1, nColumns - 1);
@@ -388,8 +405,10 @@ Matrix Matrix::getCofactor(int r, int c)
 	return m;
 }
 
+//return the determinant of the matrix.
 double Matrix::getDeterminant()
 {
+	//valid only when rows=columns.
 	if (nRows != nColumns)
 		throw("Invalid matrix dimension");
 	if (nRows == 1 && nColumns == 1)return values[0][0];
