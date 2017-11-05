@@ -130,39 +130,40 @@ void Matrix::copy(double d)
 void Matrix::copy(string s)
 {
 	reset();
-	char* buffer = new char[s.length() + 1];
-    //strcpy_s(buffer, s.length() + 1, s.c_str());
-	strncpy(buffer, s.c_str(), s.length() + 1);
-	//char* lineContext;
-	const char* lineSeparators = ";\r\n";
-	//char* line = strtok_s(buffer, lineSeparators, &lineContext);
-   // char* line = strtok_s(buffer, lineSeparators, &lineContext);
-     char* line = strtok(buffer, lineSeparators);
-     char* Remainlines = strtok(NULL, "");
-	while (line)
-	{
-		Matrix row;
-       // char* context;
-        const char* separators = " []";
-		//char* token = strtok_s(line, separators, &context);
-		char* token = strtok(line, separators);
 
-		while (token)
+	char* buffer = new char[s.length() + 1];
+	strncpy(buffer, s.c_str(), s.length() + 1); //copying the input string to a buffer because strtok will destruct it.
+	
+	const char* lineSeparators = ";\r\n"; //separators used to indicate a ln has been terminated
+	char* line = strtok(buffer, lineSeparators); //tokenizes the first ln 
+     	char* Remainlines = strtok(NULL, ""); //tokenizes the remaining lns
+	
+	while (line) //line here is my token
+	{
+		Matrix row; //empty matrix
+	        const char* separators = " []"; //row separator is space 
+						//while [] are used for the first and last rows only (as they have to be removed)
+		char* token = strtok(line, separators); //tokenizes the line into numbers (still in a string form)
+
+		while (token) //the token here is the ln I'm extracting numbers from
 		{
-		    const double token_value=atof(token);
+			const double token_value=atof(token); //converts the tokens into doubles
+			
 			Matrix item;
-            item = (const double)token_value;
-			row.addColumn(item);
-			token = strtok(NULL, separators);
+			item = (const double)token_value; //filling the matrix with numbers
+			row.addColumn(item); //add each item in its correct column in the (row) matrix
+			
+			token = strtok(NULL, separators); //gets the next token (or number in our case)
 
 		}
-		if (row.nColumns>0 && (row.nColumns == nColumns || nRows == 0))
-			addRow(row);
+		
+		if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
+			addRow(row); //add this row to "this"
 
-        line = strtok(Remainlines, lineSeparators);
-        Remainlines = strtok(NULL, "");
-			//addRow(row);line = strtok_s(NULL, lineSeparators, &lineContext);
+	        line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
+        	Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
 	}
+	
 	delete[] buffer;
 }
 
@@ -256,14 +257,6 @@ void Matrix::mul(Matrix& m)
 	}
 	copy(r);
 }
-
-
-void Matrix::operator%=(const Matrix& m)
-	{
-
-	}
-
-
 
 void Matrix::operator*=(Matrix& m) { mul(m); }
 void Matrix::operator*=(double d)
@@ -364,11 +357,6 @@ Matrix Matrix::getSubMatrix(int r, int c, int nRows, int nColumns)
 			m.values[iR][iC] = values[r + iR][c + iC];
 	return m;
 }
-
-/*void Matrix::setMatrix()
-{
-
-}*/
 
 //add column to matrix (m).
 void Matrix::addColumn(Matrix& m)
