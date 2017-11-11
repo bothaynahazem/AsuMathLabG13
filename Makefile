@@ -1,6 +1,6 @@
 
 compiler=g++  #if we want to change it anytime
-flags = -c -wall  #compiler flags
+flags = -c -Wall  #compiler flags
 
 
 
