@@ -16,3 +16,5 @@ class.test: Matrix2017.cpp
 clean:
 	rm -rf *o 
 	
+debug:	main.cpp Matrix2017.cpp
+	g++ -ggdb3 main.cpp Matrix2017.cpp -o test
