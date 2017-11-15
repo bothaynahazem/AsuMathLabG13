@@ -57,7 +57,7 @@ public:
 	Matrix a,b;
 	a.mul(b);
 	*/
-	
+
 	/*operators*/
 	Matrix operator=(const Matrix& m);
 	Matrix operator=(const double d);
@@ -94,7 +94,7 @@ public:
 	to multiply each element of (this) Matrix with -1
 	it returns a Matrix just to allow this line (a=-b;)
 	but you can use it like this (-a;)
-	
+
 	example:
 	Matrix a,b;
 	a=-b;
@@ -172,8 +172,8 @@ example:
 	/*
 	it is used to:
 	multiply elements of (this) Matrix by double (d) and return the result Matrix
-	
-	
+
+
 	example:
 	double d;
 	Matrix a,b;
@@ -240,8 +240,25 @@ example:
 	b=a--x;
 	*/
 
-	friend istream& operator >> (istream &is, Matrix& C); //Stream
-	friend ostream& operator << (ostream &os, Matrix& C); //Stream
+	/*ADVANCED OPERATIONS*/
+	Matrix rdivide(const double d, const Matrix& m);
+    /*simple right array division
+     --> 1./A <-- for example
+     dividing 1 by every element in the array A
+    */
+	Matrix rdivide(const Matrix& m1, const Matrix& m2);
+    /*more complex right array division
+     --> A./B <-- for example
+     dividing every element in A by every corresponding element in the array B
+
+     from MatLab:
+     The numerator input a can be complex,
+     but the denominator b requires a real-valued input.
+     If a is complex, the real and imaginary parts of a are independently divided by b.
+    */
+
+	friend istream& operator >> (istream &is, Matrix& C); //input stream
+	friend ostream& operator << (ostream &os, Matrix& C); //output stream
 
 	void setSubMatrix(int iR, int iC, Matrix& m);
 	Matrix getSubMatrix(int r, int c, int nRows, int nColumns);
@@ -281,3 +298,5 @@ example:
 	Matrix getInverse();
 	Matrix div(Matrix &m);
 };
+
+
