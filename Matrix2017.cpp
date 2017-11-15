@@ -11,6 +11,7 @@ Matrix::Matrix() //default constructor
 	nRows = nColumns = 0;
 	values = NULL;
 }
+
 Matrix::~Matrix() //default destructor
 {
 	reset();
@@ -133,37 +134,37 @@ void Matrix::copy(string s)
 
 	char* buffer = new char[s.length() + 1];
 	strncpy(buffer, s.c_str(), s.length() + 1); //copying the input string to a buffer because strtok will destruct it.
-	
+
 	const char* lineSeparators = ";\r\n"; //separators used to indicate a ln has been terminated
-	char* line = strtok(buffer, lineSeparators); //tokenizes the first ln 
+	char* line = strtok(buffer, lineSeparators); //tokenizes the first ln
      	char* Remainlines = strtok(NULL, ""); //tokenizes the remaining lns
-	
+
 	while (line) //line here is my token
 	{
 		Matrix row; //empty matrix
-	        const char* separators = " []"; //row separator is space 
+	        const char* separators = " []"; //row separator is space
 						//while [] are used for the first and last rows only (as they have to be removed)
 		char* token = strtok(line, separators); //tokenizes the line into numbers (still in a string form)
 
 		while (token) //the token here is the ln I'm extracting numbers from
 		{
 			const double token_value=atof(token); //converts the tokens into doubles
-			
+
 			Matrix item;
 			item = (const double)token_value; //filling the matrix with numbers
 			row.addColumn(item); //add each item in its correct column in the (row) matrix
-			
+
 			token = strtok(NULL, separators); //gets the next token (or number in our case)
 
 		}
-		
+
 		if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
 			addRow(row); //add this row to "this"
 
 	        line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
         	Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
 	}
-	
+
 	delete[] buffer;
 }
 
@@ -217,6 +218,7 @@ void Matrix::add(const Matrix& m)
 			values[iR][iC] += m.values[iR][iC];
 	}
 }
+
 void Matrix::operator+=(Matrix& m) { add(m); }
 void Matrix::operator+=(double d) { add(Matrix(nRows, nColumns, MI_VALUE, d)); }
 Matrix Matrix::operator+(Matrix& m) { Matrix r = *this;r += m;return r; }
@@ -319,7 +321,7 @@ Matrix Matrix::operator--(int) //int is not used.
 {
 	Matrix r = *this;
 	add(Matrix(nRows, nColumns, MI_VALUE, -1.0));
-	return r; 
+	return r;
 }
 
 //return the same matrix multiplied by a negative sign for each element.
@@ -409,6 +411,22 @@ double Matrix::getDeterminant()
 	return value;
 }
 
+Matrix Matrix::rdivide(double d, const Matrix& m)
+{
+    Matrix result(m.nRows,m.nColumns);
+
+    for (int i=0; i<m.nRows; i++)
+    {
+        for (int j=0; j<m.nColumns; j++)
+        {
+            result.values[i][j] = ( d / m.values[i][j] );
+        }
+
+    }
+
+    return result;
+}
+
 istream& operator >> (istream &is, Matrix& m) //inputs the matrix through "cin>>" example: Matrix myMatrix; cin>>myMatrix;
 {
 	string s;
@@ -417,25 +435,26 @@ istream& operator >> (istream &is, Matrix& m) //inputs the matrix through "cin>>
 	m = Matrix( s); //uses the constructor which takes an input string
 	return is;
 }
+
 ostream& operator << (ostream &os, Matrix& m) //prints out the matrix elements using "cout<<"
 {
 	os << m.getString();
 	return os;
 }
 
-Matrix Matrix::getInverse()//inverse=(1/determinant)*transpose of cofactor matrix
+Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matrix
 {
-	if (nRows != nColumns)//inverse can only be done on square matrices
+	if (nRows != nColumns) //inverse can only be done on square matrices
 		throw("Invalid Matrix Dimension");
-	Matrix n(nRows, nColumns);// copy matrix
+	Matrix n(nRows, nColumns); // copy matrix
 	for (int iR = 0;iR<n.nRows;iR++)
 		for (int iC = 0;iC<n.nColumns;iC++)
 		{
 			n.values[iR][iC] = values[iR][iC];
 		}
-	double det_value = n.getDeterminant();//determinant value of the matrix
+	double det_value = n.getDeterminant(); //determinant value of the matrix
 
-	Matrix m(nRows, nColumns);//cofactor matrix
+	Matrix m(nRows, nColumns); //cofactor matrix
 	int sign = 1;
 
 	for (int iR = 0;iR<m.nRows;iR++)
@@ -461,11 +480,17 @@ Matrix Matrix::getTranspose() {
 	return x;
 }
 
-
-
-//void mul_dot_astrisk(Matrix& m)
+//Matrix Matrix::rdivide(const Matrix& m1, const Matrix& m2) //not yet implemented
 //{
-//	if (nRows != m.nRows || nColumns != m.nColumns)
+//    if (m1.nRows != m2.nRows || m1.nColumns != m2.nColumns)
 //		throw("Invalid matrix dimension");
 //
+//    Matrix result;
+//
+//
+//    return result;
+//
 //}
+
+
+
