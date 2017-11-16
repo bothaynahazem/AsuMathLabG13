@@ -446,25 +446,24 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 {
 	if (nRows != nColumns) //inverse can only be done on square matrices
 		throw("Invalid Matrix Dimension");
-	Matrix n(nRows, nColumns); // copy matrix
-	for (int iR = 0;iR<n.nRows;iR++)
-		for (int iC = 0;iC<n.nColumns;iC++)
-		{
-			n.values[iR][iC] = values[iR][iC];
-		}
+	Matrix n=*this;
 	double det_value = n.getDeterminant(); //determinant value of the matrix
 
 	Matrix m(nRows, nColumns); //cofactor matrix
-	int sign = 1;
+	int sign_c =1;
+	int sign_r=1;
 
 	for (int iR = 0;iR<m.nRows;iR++)
+    {
+        sign_c=sign_r;
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-			m.values[iR][iC] = sign*n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
-			sign *= -1;//following sign rule in matrices
+			m.values[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
+			sign_c *=-1;//following sign rule in matrices
 		}
-
-	m.getTranspose();//transpose of cofactor matrix
+        sign_r*=-1;
+    }
+	m=m.getTranspose();//transpose of cofactor matrix
 	m *= (1 / det_value);
 	return m;
 }
