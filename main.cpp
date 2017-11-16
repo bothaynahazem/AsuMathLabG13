@@ -84,102 +84,160 @@ int main()
 
 if (variables_names[0]=="a")
     variables_names[0]="A";
-//
-///*test*/
-//    cout<<variables_names[3]<<endl;
-//    cout<<variables_names[4]<<endl;
-//    cout<<variables_names[2]<<endl;
-///*test*/
+
+/*test*/
+    cout<<variables_names[3]<<endl;
+    cout<<variables_names[4]<<endl;
+    cout<<variables_names[2]<<endl;
 
 
-Matrix A,B,result; //to carry out operations on
+
+Matrix first_matrix,second_matrix,result; //to carry out operations on
 
 string current_var_name;
 string first_operand; //for ex: A       /* why string ? because char didn't work as "variables_names is declared as string* and I don't know how to change it uptil now*/
 string second_operand; //for ex: B
 
-    for (int a=0; a<number_of_commands; a++)
+string test_var_name;
+string test_cmd_name;
+
+int resulting_matrix_index=0; //for storing the results
+
+    for (int a=0; a<number_of_commands; a++) //row
     {
-        for (int b=0; b<(sizeof commands[i]/sizeof (char)); b++)
+        for (int b=0; b<(sizeof commands[i]/sizeof (char)); b++) //coloumn
         {
-            if(commands[a][b]==commands[a][3]) // while iterating on finding the operation sign
+            if(commands[a][b]==commands[a][3]) // while iterating-->on finding the operation sign
             {
                 switch(commands[a][3]) //switch on the operation (add+,subtract-,multiply*,divide/...etc)
                 {
                     case '+': //add
                     {
-                        for(int c=0; c<VARIABLES_NAMES_SIZE; c++)
+                        for(int c=0; c<number_of_commands; c++)
                         {
                             current_var_name=variables_names[c];
                             first_operand=commands[a][2];
                             second_operand=commands[a][4];
 
                             if(current_var_name==first_operand)
-                                A=input_matrices[c];
+                                first_matrix=input_matrices[c];
 
                             if (current_var_name==second_operand)
-                                B=input_matrices[c];
+                                second_matrix=input_matrices[c];
                         }
-                        result=A+B;
-                        cout<< commands[a][0] << "=" << result <<endl;
+
+                        result=first_matrix+second_matrix;
+
+                        test_cmd_name=commands[a][0];
+                        for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
+                        {
+                            //on finding the matrix to be modified, modify it then break
+                            test_var_name=variables_names[i];
+                            if (test_var_name==test_cmd_name)
+                            {
+                                input_matrices[i]=result;
+                                break;
+                            }
+                        }
+
+                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                     }
                     break;
 
                     case '-': //subtract
                     {
 
-                     for(int c=0; c<VARIABLES_NAMES_SIZE; c++)
+                     for(int c=0; c<number_of_commands; c++)
                         {
                             current_var_name=variables_names[c];
                             first_operand=commands[a][2];
                             second_operand=commands[a][4];
 
                             if(current_var_name==first_operand)
-                                A=input_matrices[c];
+                                first_matrix=input_matrices[c];
 
                             if (current_var_name==second_operand)
-                                B=input_matrices[c];
+                                second_matrix=input_matrices[c];
                         }
-                        result=A-B;
-                        cout<< commands[a][0] << "=" << result <<endl;
+                        result=first_matrix-second_matrix;
+
+                        test_cmd_name=commands[a][0];
+                        for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
+                        {
+                            //on finding the matrix to be modified, modify it then break
+                            test_var_name=variables_names[i];
+                            if (test_var_name==test_cmd_name)
+                            {
+                                input_matrices[i]=result;
+                                break;
+                            }
+                        }
+
+                        cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
                     }
                     break;
 
                     case '*':
                     {
-                        for(int c=0; c<VARIABLES_NAMES_SIZE; c++)
+                        for(int c=0; c<number_of_commands; c++)
                         {
                             current_var_name=variables_names[c];
                             first_operand=commands[a][2];
                             second_operand=commands[a][4];
 
                             if(current_var_name==first_operand)
-                                A=input_matrices[c];
+                                first_matrix=input_matrices[c];
 
                             if (current_var_name==second_operand)
-                                B=input_matrices[c];
+                                second_matrix=input_matrices[c];
                         }
-                        result=A*B;
-                        cout<< commands[a][0] << "=" << result <<endl;
+                        result=first_matrix*second_matrix;
+
+                        test_cmd_name=commands[a][0];
+                        for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
+                        {
+                            //on finding the matrix to be modified, modify it then break
+                            test_var_name=variables_names[i];
+                            if (test_var_name==test_cmd_name)
+                            {
+                                input_matrices[i]=result;
+                                break;
+                            }
+                        }
+
+                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                     }
                     break;
 
                     case '/':
                     {
-                        for(int c=0; c<VARIABLES_NAMES_SIZE; c++)
+                        for(int c=0; c<number_of_commands; c++)
                         {
                             current_var_name=variables_names[c];
                             first_operand=commands[a][2];
                             second_operand=commands[a][4];
 
                             if(current_var_name==first_operand)
-                                A=input_matrices[c];
+                                first_matrix=input_matrices[c];
 
                             if (current_var_name==second_operand)
-                                B=input_matrices[c];
+                                second_matrix=input_matrices[c];
                         }
-                        result=A/B;
-                        cout<< commands[a][0] << "=" << result <<endl;
+                        result=first_matrix/second_matrix;
+
+                        test_cmd_name=commands[a][0];
+                        for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
+                        {
+                            //on finding the matrix to be modified, modify it then break
+                            test_var_name=variables_names[i];
+                            if (test_var_name==test_cmd_name)
+                            {
+                                input_matrices[i]=result;
+                                break;
+                            }
+                        }
+
+                        cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -195,33 +253,60 @@ string second_operand; //for ex: B
                             double inputDouble=0.0; //in case it's a double/Matrix
                             bool MatOverMat=false; //not used but we may use it later
 
-                            for(int c=0; c<VARIABLES_NAMES_SIZE; c++)
+                            for(int c=0; c<number_of_commands; c++)
                             {
                                 current_var_name=variables_names[c];
-                                inputDouble=(double)commands[a][2];
+                                string current_double;
+                                current_double=commands[a][2];
+
+                                inputDouble=atof(current_double.c_str());
                                 first_operand=commands[a][5]; //the only operand
 
                                 if(current_var_name==first_operand)
-                                    A=input_matrices[c];
+                                    first_matrix=input_matrices[c];
                             }
-                             result=result.rdivide(inputDouble, A);
+                             result=result.rdivide(inputDouble/*1 for example*/, first_matrix);
                         }
-                            cout<< commands[a][0] << "=" << result <<endl;
+
+                            test_cmd_name=commands[a][0];
+                            for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
+                            {
+                                //on finding the matrix to be modified, modify it then break
+                                test_var_name=variables_names[i];
+                                if (test_var_name==test_cmd_name)
+                                {
+                                    input_matrices[i]=result;
+                                    break;
+                                }
+                            }
+                            cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                         }
                         break;
 
-                    case '\'': //single quote --> Traspose
+                    case '\'': //single quote --> Transpose
                     {
-                        for(int c=0; c<VARIABLES_NAMES_SIZE; c++)
+                        for(int c=0; c<number_of_commands; c++)
                         {
                             current_var_name=variables_names[c];
                             first_operand=commands[a][2];
 
                             if(current_var_name==first_operand)
-                                A=input_matrices[c];
+                                first_matrix=input_matrices[c];
                         }
-                        result=A.getTranspose();
-                        cout<< commands[a][0] << "=" << result <<endl;
+                        result=first_matrix.getTranspose();
+
+                        test_cmd_name=commands[a][0];
+                        for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
+                        {
+                            //on finding the matrix to be modified, modify it then break
+                            test_var_name=variables_names[i];
+                            if (test_var_name==test_cmd_name)
+                            {
+                                input_matrices[i]=result;
+                                break;
+                            }
+                        }
+                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                     }
                     break;
 
