@@ -241,7 +241,7 @@ example:
 	*/
 
 	/*ADVANCED OPERATIONS*/
-	Matrix rdivide(const double d, const Matrix& m);
+	Matrix rdivide(double d, const Matrix& m);
     /*simple right array division
      --> 1./A <-- for example
      dividing 1 by every element in the array A
