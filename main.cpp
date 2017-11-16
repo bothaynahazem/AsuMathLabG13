@@ -85,13 +85,6 @@ int main()
 if (variables_names[0]=="a")
     variables_names[0]="A";
 
-/*test*/
-    cout<<variables_names[3]<<endl;
-    cout<<variables_names[4]<<endl;
-    cout<<variables_names[2]<<endl;
-
-
-
 Matrix first_matrix,second_matrix,result; //to carry out operations on
 
 string current_var_name;
@@ -101,9 +94,7 @@ string second_operand; //for ex: B
 string test_var_name;
 string test_cmd_name;
 
-int resulting_matrix_index=0; //for storing the results
-
-    for (int a=0; a<number_of_commands; a++) //row
+for (int a=0; a<number_of_commands; a++) //row
     {
         for (int b=0; b<(sizeof commands[i]/sizeof (char)); b++) //coloumn
         {
