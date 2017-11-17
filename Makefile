@@ -4,15 +4,8 @@ flags = -c -Wall  #compiler flags
 
 
 
-Matrix2017: main.test class.test
-	$(compiler) main.o Matrix2017.o -o Matrix2017
-
-main.test: main.cpp
-	$(compiler) $(flags) main.cpp
-
-class.test: Matrix2017.cpp
-	$(compiler) $(flags) Matrix2017.cpp
+Matrix2017: main.cpp Matrix2017.cpp
+	$(compiler) main.cpp Matrix2017.cpp -o Matrix
 
 clean:
-	rm -rf *o 
-	
+	rm -rf *o

@@ -1,27 +1,24 @@
 #include "Matrix2017.h"
 
-#define INPUT_MATRICES_SIZE 10
-#define VARIABLES_NAMES_SIZE 60
+#define INPUT_MATRICES_SIZE 100
+#define VARIABLES_NAMES_SIZE 100
 
-int main()
+int main(int argc,char* argv[])
 {
 	char** commands;
-	ifstream infile("phase_1_example.txt");
+	ifstream infile(argv[1]);
 
-	Matrix* input_matrices= new Matrix[10];// array to hold matrices values
-	string* variables_names=new string[60];// array to hold matrices variable charachter
-	//string variables_names=new string[60];// array to hold matrices variable charachter
-//	char* variables_names=new char[60];// array to hold matrices variable charachter
+	Matrix* input_matrices= new Matrix[INPUT_MATRICES_SIZE];// array to hold matrices values
+	string* variables_names=new string[VARIABLES_NAMES_SIZE];// array to hold matrices variable charachter
 
 	int in_cntr=0;// common index between 2 arrays
 
 	Matrix m;
-	string contents[20];//array contains file contents
+	string contents[50];//array contains file contents
 	string line;
 
 	int numberoflines=0;//index contains number of lines in file
 	int i=0;//index for contents array
-	//int max_number_of_characters_in_a_command=0;
 	int number_of_commands=0;
 
     while(getline(infile,contents[i]))// getting file contents
@@ -94,7 +91,9 @@ string second_operand; //for ex: B
 string test_var_name;
 string test_cmd_name;
 
-for (int a=0; a<number_of_commands; a++) //row
+int resulting_matrix_index=0; //for storing the results
+
+    for (int a=0; a<number_of_commands; a++) //row
     {
         for (int b=0; b<(sizeof commands[i]/sizeof (char)); b++) //coloumn
         {
@@ -131,7 +130,7 @@ for (int a=0; a<number_of_commands; a++) //row
                             }
                         }
 
-                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -164,7 +163,7 @@ for (int a=0; a<number_of_commands; a++) //row
                             }
                         }
 
-                        cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" <<"\n\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -196,7 +195,7 @@ for (int a=0; a<number_of_commands; a++) //row
                             }
                         }
 
-                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -228,7 +227,7 @@ for (int a=0; a<number_of_commands; a++) //row
                             }
                         }
 
-                        cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" <<"\n\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -270,7 +269,7 @@ for (int a=0; a<number_of_commands; a++) //row
                                     break;
                                 }
                             }
-                            cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
+                            cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
                         }
                         break;
 
@@ -297,7 +296,7 @@ for (int a=0; a<number_of_commands; a++) //row
                                 break;
                             }
                         }
-                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -308,18 +307,6 @@ for (int a=0; a<number_of_commands; a++) //row
             }
         }
     }
-
-    /*For printing the contents of commands*/
-    /*for testing purposes only, in other words*/
-//    for(int i=0;i<number_of_commands;i++)
-//    {
-//		for(int j=0;j<(sizeof commands[i] / sizeof(char));j++)
-//		cout<<commands[i][j]<<endl;
-//
-//		cout<<"End of line "<<i<<endl;
-//    }
-
+	
 	return 0;
 }
-
-

@@ -6,3 +6,7 @@ November 14th, 2017
 The main is almost finished, everything being stored and working fine except for the divide function.
 Its outputs aren't correct for a reason I don't understand.
 November 16th, 2017
+
+
+Everything working fine, thank God.
+November 17th, 2017

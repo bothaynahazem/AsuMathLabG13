@@ -190,7 +190,7 @@ string Matrix::getString()
 			//cout << values[iR][iC] << " ";
 
 			char buffer[50]="";
-			snprintf(buffer, 50, "%g\t", values[iR][iC]);
+			snprintf(buffer, 50, "%.4f\t", values[iR][iC]);
 			s += buffer;
 		}
 		//cout << endl;
