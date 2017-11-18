@@ -190,7 +190,7 @@ string Matrix::getString()
 			//cout << values[iR][iC] << " ";
 
 			char buffer[50]="";
-			snprintf(buffer, 50, "%.4f\t", values[iR][iC]);
+			snprintf(buffer, 50, "%g\t", values[iR][iC]);
 			s += buffer;
 		}
 		//cout << endl;
@@ -408,6 +408,10 @@ double Matrix::getDeterminant()
 		value += m * values[0][iR] * getCofactor(0, iR).getDeterminant();
 		m *= -1;
 	}
+
+	if (value==0) throw("can't divide, det=0");
+        //return;
+
 	return value;
 }
 
@@ -448,6 +452,9 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
 	double det_value = n.getDeterminant(); //determinant value of the matrix
+
+	if (det_value==0)
+        {throw ("Determinant is zero");}
 
 	Matrix m(nRows, nColumns); //cofactor matrix
 	int sign_c =1;

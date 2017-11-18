@@ -5,12 +5,14 @@
 
 int main(int argc,char* argv[])
 {
-    try
-    {
+//    try
+//    {
 
 
 	char** commands;
-	ifstream infile(argv[1]);
+	 //ifstream infile("phase_1_example.txt");
+	 //ifstream infile("big_matrix_example.txt");
+	 ifstream infile(argv[1]);
 
 	Matrix* input_matrices= new Matrix[INPUT_MATRICES_SIZE];// array to hold matrices values
 	string* variables_names=new string[VARIABLES_NAMES_SIZE];// array to hold matrices variable charachter
@@ -216,6 +218,8 @@ for (int a=0; a<number_of_commands; a++) //row
 
                     case '/':
                     {
+
+                    try{
                         for(int c=0; c<number_of_commands; c++)
                         {
                             current_var_name=variables_names[c];
@@ -228,7 +232,9 @@ for (int a=0; a<number_of_commands; a++) //row
                             if (current_var_name==second_operand)
                                 second_matrix=input_matrices[c];
                         }
+
                         result=first_matrix/second_matrix;
+
 
                         test_cmd_name=commands[a][0];
                         for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
@@ -243,6 +249,8 @@ for (int a=0; a<number_of_commands; a++) //row
                         }
 
                         cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
+}
+                    catch(char const* error){cout<<"Error: "<<error<<endl;}
                     }
                     break;
 
@@ -323,9 +331,9 @@ for (int a=0; a<number_of_commands; a++) //row
         }
     }
 
-    }
-
-    catch (char* error){ cout<<"Error"<<error<<endl; }
+//    }
+//
+//    catch (char* error){ cout<<"Error: "<<error<<endl; }
 	return 0;
 }
 
