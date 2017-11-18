@@ -10,7 +10,7 @@ int main(int argc,char* argv[])
 
 
 	char** commands;
-	 ifstream infile(argv[1]);
+	ifstream infile(argv[1]);
 
 	Matrix* input_matrices= new Matrix[INPUT_MATRICES_SIZE];// array to hold matrices values
 	string* variables_names=new string[VARIABLES_NAMES_SIZE];// array to hold matrices variable charachter
@@ -30,15 +30,24 @@ int main(int argc,char* argv[])
 
     while(getline(infile,contents[i]))// getting file contents
     {
-			 int pos =contents[i].find("[");
+        int pos =contents[i].find("[");
 
-		 if(pos!=-1){
+        if(pos!=-1 && contents[i].find("]")==-1)
+        {
 			 getline(infile,contents[i+1],']');
 			 contents[i]+=contents[i+1];
-		 }
-		 if(contents[i]==";"){i--;numberoflines--;}
-				numberoflines++;
+        }
+
+        if(contents[i]==";")
+        {
+            i--;
+            numberoflines--;
+        }
+
+        numberoflines++;
+
         i++;
+
     }
 
 	commands = new char*[numberoflines];
