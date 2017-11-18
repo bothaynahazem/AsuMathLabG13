@@ -5,11 +5,17 @@
 
 int main(int argc,char* argv[])
 {
+    try
+    {
+
+
 	char** commands;
-	ifstream infile(argv[1]);
+	 ifstream infile(argv[1]);
 
 	Matrix* input_matrices= new Matrix[INPUT_MATRICES_SIZE];// array to hold matrices values
 	string* variables_names=new string[VARIABLES_NAMES_SIZE];// array to hold matrices variable charachter
+	//string variables_names=new string[60];// array to hold matrices variable charachter
+//	char* variables_names=new char[60];// array to hold matrices variable charachter
 
 	int in_cntr=0;// common index between 2 arrays
 
@@ -19,6 +25,7 @@ int main(int argc,char* argv[])
 
 	int numberoflines=0;//index contains number of lines in file
 	int i=0;//index for contents array
+	//int max_number_of_characters_in_a_command=0;
 	int number_of_commands=0;
 
     while(getline(infile,contents[i]))// getting file contents
@@ -68,12 +75,6 @@ int main(int argc,char* argv[])
         number_of_commands=jcopy;
     }
 
-//didn't work --> but it should for uppercase
-//    for (int i=0; i<VARIABLES_NAMES_SIZE; i++)
-//    {
-//        variables_names[i]=toupper(variables_names[i]);
-//    }
-
     for (int i=0; i<number_of_commands; i++)
     {
         variables_names[i+2]=commands[i][0];  //i+2 --> because the first two are taken A & B
@@ -91,9 +92,7 @@ string second_operand; //for ex: B
 string test_var_name;
 string test_cmd_name;
 
-int resulting_matrix_index=0; //for storing the results
-
-    for (int a=0; a<number_of_commands; a++) //row
+for (int a=0; a<number_of_commands; a++) //row
     {
         for (int b=0; b<(sizeof commands[i]/sizeof (char)); b++) //coloumn
         {
@@ -130,7 +129,7 @@ int resulting_matrix_index=0; //for storing the results
                             }
                         }
 
-                        cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -163,7 +162,7 @@ int resulting_matrix_index=0; //for storing the results
                             }
                         }
 
-                        cout<< commands[a][0] << "=" <<"\n\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -195,7 +194,7 @@ int resulting_matrix_index=0; //for storing the results
                             }
                         }
 
-                        cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -227,7 +226,7 @@ int resulting_matrix_index=0; //for storing the results
                             }
                         }
 
-                        cout<< commands[a][0] << "=" <<"\n\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -269,7 +268,7 @@ int resulting_matrix_index=0; //for storing the results
                                     break;
                                 }
                             }
-                            cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
+                            cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                         }
                         break;
 
@@ -296,7 +295,7 @@ int resulting_matrix_index=0; //for storing the results
                                 break;
                             }
                         }
-                        cout<< commands[a][0] << "=" << "\n\n" <<result <<"\n\n";
+                        cout<< commands[a][0] << "=" << "\n" <<result <<"\n\n";
                     }
                     break;
 
@@ -307,6 +306,11 @@ int resulting_matrix_index=0; //for storing the results
             }
         }
     }
-	
+
+    }
+
+    catch (char* error){ cout<<"Error"<<error<<endl; }
 	return 0;
 }
+
+
