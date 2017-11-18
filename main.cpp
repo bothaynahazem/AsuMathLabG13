@@ -30,8 +30,15 @@ int main(int argc,char* argv[])
 
     while(getline(infile,contents[i]))// getting file contents
     {
+			 int pos =contents[i].find("[");
+
+		 if(pos!=-1){
+			 getline(infile,contents[i+1],']');
+			 contents[i]+=contents[i+1];
+		 }
+		 if(contents[i]==";"){i--;numberoflines--;}
+				numberoflines++;
         i++;
-        numberoflines++;
     }
 
 	commands = new char*[numberoflines];
