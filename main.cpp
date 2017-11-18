@@ -250,7 +250,7 @@ for (int a=0; a<number_of_commands; a++) //row
 
                         cout<< commands[a][0] << "=" <<"\n" <<result <<"\n\n";
 }
-                    catch(char const* error){cout<<"Error: "<<error<<endl;}
+                    catch(char const* error){cout<<"Error: "<<error<<"\n\n";}
                     }
                     break;
 
