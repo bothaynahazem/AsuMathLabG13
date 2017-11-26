@@ -1,16 +1,12 @@
-So, uptil now, the matrix class is working fine.
-We're working on parsing the text file.
-November 14th, 2017
+This repository basically focuses on implementing a Mathematical Library Software similar to MatLab or Octave using C/C++.
+It's required as a university project for the "Software Engineering" course, third year computer engineering, fall 2017 semester.
 
+Languages used: C/C++
+Development is under: Linux (Ubuntu)
+IDE used: CodeBlocks on Ubuntu 
+Production to: Linux Server (Centos 6.7)
 
-The main is almost finished, everything being stored and working fine except for the divide function.
-Its outputs aren't correct for a reason I don't understand.
-November 16th, 2017
-
-
-Everything working fine, thank God.
-November 17th, 2017
-
-Got 6 out of 7 because of the divide function where the determinant is equal to zero.
-Needs to be solved in the next phase.
-November 24, 2017
+##This project is divided into 3 Phases:
+Phase 1: Core Operations 
+Phase 2: Advanced Operations and Tuning
+Phase 3: Advanced System Operations
