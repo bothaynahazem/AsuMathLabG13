@@ -6,7 +6,7 @@ Development is under: Linux (Ubuntu)
 IDE used: CodeBlocks on Ubuntu 
 Production to: Linux Server (Centos 6.7)
 
-##This project is divided into 3 Phases:
+This project is divided into 3 Phases:
 Phase 1: Core Operations 
 Phase 2: Advanced Operations and Tuning
 Phase 3: Advanced System Operations
