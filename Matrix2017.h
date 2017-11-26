@@ -11,6 +11,9 @@
 
 using namespace std;
 
+int LUPDecompose(double **A, int N, double Tol, int *P);
+double LUPDeterminant(double **A, int *P, int N);
+
 class Matrix
 {
 	int nRows, nColumns;
@@ -297,6 +300,7 @@ example:
 	Matrix getTranspose();
 	Matrix getInverse();
 	Matrix div(Matrix &m);
+
+
+
 };
-
-
