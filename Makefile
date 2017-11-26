@@ -4,8 +4,16 @@ flags = -c -Wall  #compiler flags
 
 
 
-Matrix2017: main.cpp Matrix2017.cpp
+all: main.cpp Matrix2017.cpp
 	$(compiler) main.cpp Matrix2017.cpp -o Matrix
 
 clean:
-	rm -rf *o
+	rm -rf *.o
+
+debug: main.cpp Matrix2017.cpp
+	$(compiler) -g main.cpp Matrix2017.cpp -o debug
+	gdb ./debug
+
+profile: main.cpp Matrix2017.cpp
+	$(compiler) -pg main.cpp Matrix2017.cpp -o profile
+	gprof ./profile
