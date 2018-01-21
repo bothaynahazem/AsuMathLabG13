@@ -1,3 +1,5 @@
+#include "Complex.h"
+
 Complex::Complex()
 {
   R = I = 0.0;
@@ -91,7 +93,9 @@ Complex Complex::operator+(double D)
 
 Complex Complex::operator-()
 {
-  return Complex(-R, -I);
+    R=-R;
+    I=-I;
+  return *this;
 }
 Complex::operator const string()
 {
@@ -144,9 +148,14 @@ double Complex::operator()(string name, string info)
   return (*this)[name];
 }
 
+//wrong function khalis khalis
 Complex Complex::operator*(Complex& A, Complex& B)
 {
-  double R = A.real()*B.real() - A.imaginary()*B.imaginary();
-  double I = A.real()*B.imaginary() + A.imaginary()*B.real();
-  return Complex(R, I);
+    Complex Product;
+    double RealV = A.real()*B.real() - A.imaginary()*B.imaginary();
+    double ImagV = A.real()*B.imaginary() + A.imaginary()*B.real();
+
+    Product(RealV,ImagV);
+
+    return Product;
 }
