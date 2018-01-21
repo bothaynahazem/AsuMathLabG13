@@ -33,16 +33,23 @@ class Complex
 
     static Complex addComplex(Complex& A, Complex& B);
     void add(Complex& C);
+    void add(double D);
+    void multiply(Complex& C);
+    void multiply(double D);
 
     Complex operator=(Complex& C);
     Complex operator=(double D);
     void operator+=(Complex& C);
-    Complex operator+=(double D);
+    void operator+=(double D);
+
     Complex operator+(Complex& C);
     Complex operator+(double D);
 
+    Complex operator*(Complex& C);
+
     Complex operator-(); //Negative
-    operator const string(); //Cast
+
+    operator const string(); //Casting
 
     friend istream& operator >> (istream &is, Complex& C); //Stream
     friend ostream& operator << (ostream &os, Complex& C); //Stream
@@ -52,7 +59,5 @@ class Complex
 
     double operator[](string name); //Index
     double operator()(string name, string info = ""); //Argument
-
-    Complex operator*(CComplex& A, CComplex& B);
 
   };

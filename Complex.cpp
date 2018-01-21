@@ -63,6 +63,25 @@ void Complex::add(Complex& C)
   I += C.I;
 }
 
+void Complex::add(double D)
+{
+    R+=D;
+}
+
+void Complex::multiply(Complex& C)
+{
+    R=R*(C.R) - I*(C.I);
+    I=R*(C.I) + I*(C.R);
+}
+
+void Complex::multiply(double D)
+{
+    R*=D;
+    I*=D;
+}
+
+
+/*-----------OPERATORS-----------*/
 Complex Complex::operator=(Complex& C)
 {
   copy(C);
@@ -84,11 +103,17 @@ void Complex::operator+=(double D)
 }
 Complex Complex::operator+(Complex& C)
 {
-  return addComplex(*this, C);
+    Complex Result;
+    Result(*this);
+    Result.add(C);
+    return Result;
 }
 Complex Complex::operator+(double D)
 {
-  return addComplex(*this, Complex(D, 0));
+    Complex Result;
+    Result(*this);
+    Result.add(D);
+    return Result;
 }
 
 Complex Complex::operator-()
@@ -148,14 +173,11 @@ double Complex::operator()(string name, string info)
   return (*this)[name];
 }
 
-//wrong function khalis khalis
-Complex Complex::operator*(Complex& A, Complex& B)
+
+Complex Complex::operator*(Complex& C)
 {
     Complex Product;
-    double RealV = A.real()*B.real() - A.imaginary()*B.imaginary();
-    double ImagV = A.real()*B.imaginary() + A.imaginary()*B.real();
-
-    Product(RealV,ImagV);
-
+    Product(*this);
+    Product.multiply(C);
     return Product;
 }
