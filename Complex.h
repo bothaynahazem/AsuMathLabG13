@@ -60,4 +60,8 @@ class Complex
     double operator[](string name); //Index
     double operator()(string name, string info = ""); //Argument
 
+    void * operator new(size_t size); //overloading "new" operator
+    void operator delete(void * p); //overloading "delete" operator
+
   };
+

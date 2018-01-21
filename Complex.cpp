@@ -181,3 +181,16 @@ Complex Complex::operator*(Complex& C)
     Product.multiply(C);
     return Product;
 }
+
+void * operator new(size_t size)
+{
+    //void* p = ::new Complex();
+    //or we could use this
+    void * p = malloc(size);
+    return p;
+}
+void operator delete(void * p)
+{
+    free(p);
+}
+
