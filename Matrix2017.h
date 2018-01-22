@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "stdarg.h"
-
+#include <cmath>
 
 using namespace std;
 
@@ -300,7 +300,26 @@ example:
 	Matrix getTranspose();
 	Matrix getInverse();
 	Matrix div(Matrix &m);
-
-
+    static Matrix sin(Matrix&s);
+    static Matrix cos(Matrix&s);
+    static Matrix tan(Matrix&s);
+    static Matrix sinh(Matrix&s);
+    static Matrix cosh(Matrix&s);
+    static Matrix tanh(Matrix&s);
+    static Matrix asin(Matrix&s);
+    static Matrix acos(Matrix&s);
+    static Matrix atan(Matrix&s);
+    static Matrix a_sinh(Matrix&s);
+    static Matrix a_cosh(Matrix&s);
+    static Matrix a_tanh(Matrix&s);
+    static Matrix log(Matrix&s);
+    static Matrix log10(Matrix&s);
+    static Matrix pow(Matrix&s,double x);
+    static Matrix rpow(Matrix&s,double x);
+    static Matrix exp(Matrix&s);
+    static Matrix sqrt(Matrix&s);
+    static Matrix cbrt(Matrix&s);
+    static Matrix ceil(Matrix&s);
+    static Matrix floor(Matrix&s);
 
 };

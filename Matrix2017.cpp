@@ -1,5 +1,6 @@
 #include "Matrix2017.h"
 
+
 int max(int a, int b)
 {
 	return (a > b ? a : b);
@@ -514,16 +515,12 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 	if (nRows != nColumns) //inverse can only be done on square matrices
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
-	Matrix m(nRows, nColumns); //cofactor matrix
 	double det_value = n.getDeterminant(); //determinant value of the matrix
+
 	if (det_value>0&&det_value<0.1)
-        {
-double x=NAN;
-m=x;
-		return m;			
-				}
+        {throw ("Determinant is zero");}
 
-
+	Matrix m(nRows, nColumns); //cofactor matrix
 	int sign_c =1;
 	int sign_r=1;
 
@@ -542,6 +539,7 @@ m=x;
 	return m;
 }
 
+
 Matrix Matrix::getTranspose() {
 	Matrix x(nColumns, nRows);
 	for (int ir = 0; ir<x.nRows;ir++) {
@@ -551,7 +549,278 @@ Matrix Matrix::getTranspose() {
 	}
 	return x;
 }
-
+Matrix Matrix::sin(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::sin(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::cos(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=std::cos(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::tan(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::tan(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::acos(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=std::acos(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::asin(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=std::asin(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::atan(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=std::atan(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::sinh(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=std::sinh(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::cosh(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=std::cosh(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::tanh(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=std::tanh(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::a_sinh(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=asinh(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::a_cosh(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=acosh(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::a_tanh(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+		    m.values[iR][iC]=atanh(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::log(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::log(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::log10(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::log10(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::exp(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::exp(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::sqrt(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::log(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::cbrt(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::log(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::rpow(Matrix&s,double x)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::pow(s.values[iR][iC],x);
+		}
+    }
+    return m;
+}
+Matrix Matrix::pow(Matrix&s,double x)
+{
+    if(s.nRows!=s.nColumns)throw("Invalid matrix dimensions");
+    if(x<-1)throw("Invalid Power");
+    if(x==0)
+    {
+        Matrix m(s.nRows,s.nColumns,MI_EYE);
+        return m;
+    }
+    else if(x==1)
+    {
+        Matrix m(s.nRows,s.nColumns);
+         m.copy(s);
+         return m;
+    }
+    else if(x==-1)
+    {
+        Matrix m(s.nRows,s.nColumns);
+        m=s.getInverse();
+        return m;
+    }
+    else
+    {
+      Matrix m(s.nRows,s.nColumns);
+      m.copy(s);
+      for(int i=1;i<x;i++)
+        {
+           m*=s;
+        }
+     return m;
+    }
+}
+Matrix Matrix::floor(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::floor(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
+Matrix Matrix::ceil(Matrix&s)
+{
+    Matrix m(s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.values[iR][iC]=std::ceil(s.values[iR][iC]);
+		}
+    }
+    return m;
+}
 
 //Matrix Matrix::rdivide(const Matrix& m1, const Matrix& m2) //not yet implemented
 //{
