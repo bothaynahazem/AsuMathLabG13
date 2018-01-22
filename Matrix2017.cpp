@@ -516,11 +516,15 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
 	double det_value = n.getDeterminant(); //determinant value of the matrix
-
-	if (det_value>0&&det_value<0.1)
-        {throw ("Determinant is zero");}
-
 	Matrix m(nRows, nColumns); //cofactor matrix
+	if (det_value>0&&det_value<0.1)
+        {
+		int x=NAN;
+		m=x;
+		return m;
+	}
+
+	
 	int sign_c =1;
 	int sign_r=1;
 
