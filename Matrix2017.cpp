@@ -524,7 +524,7 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 		return m;
 	}
 
-	
+
 	int sign_c =1;
 	int sign_r=1;
 
@@ -740,7 +740,7 @@ Matrix Matrix::sqrt(Matrix&s)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-            m.values[iR][iC]=std::log(s.values[iR][iC]);
+            m.values[iR][iC]=std::sqrt(s.values[iR][iC]);
 		}
     }
     return m;
@@ -752,7 +752,7 @@ Matrix Matrix::cbrt(Matrix&s)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-            m.values[iR][iC]=std::log(s.values[iR][iC]);
+            m.values[iR][iC]=std::cbrt(s.values[iR][iC]);
 		}
     }
     return m;
