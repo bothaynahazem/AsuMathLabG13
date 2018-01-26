@@ -779,21 +779,21 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 	if (nRows != nColumns) //inverse can only be done on square matrices
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
-	complex<double> det_value = n.getDeterminant(); //determinant value of the matrix
+	complex<double> det_value = n.getcDeterminant(); //determinant value of the matrix
 
 	if (abs(det_value)>0&&abs(det_value)<0.1)
         {throw ("Determinant is zero");}
 
-	Matrix m(nRows, nColumns); //cofactor matrix
-	int sign_c =1;
-	int sign_r=1;
+	Matrix m("complex",nRows, nColumns); //cofactor matrix
+	double sign_c =1;
+	double sign_r=1;
 
 	for (int iR = 0;iR<m.nRows;iR++)
     {
         sign_c=sign_r;
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-			m.cvalues[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
+			m.cvalues[iR][iC] = sign_c * n.getCofactor(iR, iC).getcDeterminant();//getting detreminant values of cofactor matrix
 			sign_c *=-1;//following sign rule in matrices
 		}
         sign_r*=-1;
@@ -828,11 +828,12 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 			 sign_r*=-1;
 	 }
  m=m.getTranspose();//transpose of cofactor matrix
- m *= (1 / det_value);
+ m *= (1.0 / det_value);
  return m;
  }
 
 }
+
 
 
 Matrix Matrix::getTranspose() {
