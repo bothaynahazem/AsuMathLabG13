@@ -11,6 +11,8 @@ Matrix::Matrix() //default constructor
 {
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues=NULL;
+	type="none";
 }
 
 Matrix::~Matrix() //default destructor
@@ -22,6 +24,7 @@ Matrix::Matrix(int nRows, int nColumns, int initialization, double initializatio
 {
 	this->nRows = nRows;
 	this->nColumns = nColumns;
+	cvalues=NULL;
 	if ((nRows*nColumns) == 0)
 	{
 		values = NULL;
@@ -77,10 +80,12 @@ Matrix::Matrix(int nRows, int nColumns, double first, ...)
 	va_end(va);
 }
 
+
 Matrix::Matrix(Matrix& m)
 {
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues=NULL;
 	copy(m);
 }
 
@@ -106,16 +111,33 @@ void Matrix::copy(const Matrix& m)
 	if ((nRows*nColumns) == 0)
 	{
 		values = NULL;
+		cvalues=NULL;
 		return;
 	}
-	values = new double*[nRows];
-	for (int iR = 0;iR<nRows;iR++)
-	{
+   if(m.type=="complex")
+   {
+     type="complex";
+	 cvalues = new complex<double>*[nRows];
+	 for (int iR = 0;iR<nRows;iR++)
+	 {
+		cvalues[iR] = new complex<double>[nColumns];
+		for (int iC = 0;iC<nColumns;iC++)
+		{
+			cvalues[iR][iC] = m.cvalues[iR][iC];
+		}
+	 }
+	}
+   else
+    {
+	 values = new double*[nRows];
+	 for (int iR = 0;iR<nRows;iR++)
+	 {
 		values[iR] = new double[nColumns];
 		for (int iC = 0;iC<nColumns;iC++)
 		{
 			values[iR][iC] = m.values[iR][iC];
 		}
+	 }
 	}
 }
 
@@ -170,15 +192,25 @@ void Matrix::copy(string s)
 }
 
 void Matrix::reset()
-{
+{   if(type=="complex")
+   {
+    if(cvalues)
+    {
+      for(int i=0;i<nRows;i++)
+        delete[] cvalues[i];
+    }
+		delete[] cvalues;
+   }
+    else
+    {
 	if (values)
-	{
 		for (int i = 0;i<nRows;i++)
 			delete[] values[i];
-		delete[] values;
-	}
+        delete[] values;
+    }
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues=NULL;
 }
 
 string Matrix::getString()
@@ -191,6 +223,9 @@ string Matrix::getString()
 			//cout << values[iR][iC] << " ";
 
 			char buffer[50]="";
+			if(this->type=="complex")
+            snprintf(buffer, 50, "(%g)+(%g)i\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
+            else
 			snprintf(buffer, 50, "%g\t", values[iR][iC]);
 			s += buffer;
 		}
@@ -243,6 +278,64 @@ Matrix Matrix::operator-(double d) { Matrix r = *this;r -= d;return r; }
 
 void Matrix::mul(Matrix& m)
 {
+	if(this->type=="complex"&& m.type=="complex"){
+
+	if (nColumns != m.nRows) //that's how matrices are multiplied
+		throw("Invalid matrix dimension for multiplication");
+
+	Matrix r("complex",nRows, m.nColumns); //the dim of the product matrix
+
+	for (int iR = 0; iR<r.nRows; iR++)
+	{
+		for (int iC = 0; iC < r.nColumns; iC++)
+		{
+			r.cvalues[iR][iC] = 0; //initializing this particular element of the matrix with zero
+
+			for (int k = 0; k < m.nColumns; k++)
+				r.cvalues[iR][iC] += cvalues[iR][k] * m.cvalues[k][iC];
+		}
+	}
+ copy(r);
+}
+else if(this->type=="complex" && m.type!="complex"){
+
+	if (nColumns != m.nRows) //that's how matrices are multiplied
+		throw("Invalid matrix dimension for multiplication");
+
+	Matrix r("complex",nRows, m.nColumns); //the dim of the product matrix
+
+	for (int iR = 0; iR<r.nRows; iR++)
+	{
+		for (int iC = 0; iC < r.nColumns; iC++)
+		{
+			r.cvalues[iR][iC] = 0; //initializing this particular element of the matrix with zero
+
+			for (int k = 0; k < m.nColumns; k++)
+				r.cvalues[iR][iC] += cvalues[iR][k] * m.values[k][iC];
+		}
+	}
+ copy(r);
+}
+else if(this->type!="complex" && m.type=="complex"){
+
+	if (nColumns != m.nRows) //that's how matrices are multiplied
+		throw("Invalid matrix dimension for multiplication");
+
+	Matrix r("complex",nRows, m.nColumns); //the dim of the product matrix
+
+	for (int iR = 0; iR<r.nRows; iR++)
+	{
+		for (int iC = 0; iC < r.nColumns; iC++)
+		{
+			r.cvalues[iR][iC] = 0; //initializing this particular element of the matrix with zero
+
+			for (int k = 0; k < m.nColumns; k++)
+				r.cvalues[iR][iC] += values[iR][k] * m.cvalues[k][iC];
+		}
+	}
+ copy(r);
+}
+else{
 	if (nColumns != m.nRows) //that's how matrices are multiplied
 		throw("Invalid matrix dimension for multiplication");
 
@@ -258,7 +351,9 @@ void Matrix::mul(Matrix& m)
 				r.values[iR][iC] += values[iR][k] * m.values[k][iC];
 		}
 	}
+
 	copy(r);
+}
 }
 
 void Matrix::operator*=(Matrix& m) { mul(m); }
@@ -346,7 +441,13 @@ void Matrix::setSubMatrix(int r, int c, Matrix& m)
 		throw("Invalid matrix dimension");
 	for (int iR = 0;iR<m.nRows;iR++)
 		for (int iC = 0;iC<m.nColumns;iC++)
+		{   if(this->type=="complex"&&m.type!="complex")
+		    cvalues[r + iR][c + iC] = m.values[iR][iC];
+		    else if(m.type=="complex")
+            cvalues[r + iR][c + iC] = m.cvalues[iR][iC];
+            else
 			values[r + iR][c + iC] = m.values[iR][iC];
+		}
 }
 
 //extract a submatrix from matrix, r & c are row & column where we want to extract. nRows & nColumns are the rows & columns of the submatrix.
@@ -363,20 +464,41 @@ Matrix Matrix::getSubMatrix(int r, int c, int nRows, int nColumns)
 
 //add column to matrix (m).
 void Matrix::addColumn(Matrix& m)
-{
+{   if(m.type=="complex")
+    {
+    Matrix n("complex",max(nRows, m.nRows), nColumns + m.nColumns);
+    n.setSubMatrix(0, 0, *this);
+	n.setSubMatrix(0, nColumns, m);
+	*this = n;
+    }
+    else
+    {
 	Matrix n(max(nRows, m.nRows), nColumns + m.nColumns);
 	n.setSubMatrix(0, 0, *this);
 	n.setSubMatrix(0, nColumns, m);
 	*this = n;
+    }
+
 }
 
 //add row to matrix (m).
 void Matrix::addRow(Matrix& m)
 {
-	Matrix n(nRows + m.nRows, max(nColumns, m.nColumns));
+    if(m.type=="complex")
+        {
+	Matrix n("complex",nRows + m.nRows, max(nColumns, m.nColumns));
 	n.setSubMatrix(0, 0, *this);
 	n.setSubMatrix(nRows, 0, m);
 	*this = n;
+        }
+	else
+      {
+    Matrix n(nRows + m.nRows, max(nColumns, m.nColumns));
+	n.setSubMatrix(0, 0, *this);
+	n.setSubMatrix(nRows, 0, m);
+	*this = n;
+      }
+
 }
 
 //return cofactor matrix, r & c are element's row & column which we want to get its cofactor.
@@ -404,11 +526,21 @@ double Matrix::getDeterminant()
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.values,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.values,p,nRows);
-			 if(result>0 && result<0.01)result=0;
-			 return result;
+
 		 }
+return result;
+}
 
+complex<double> Matrix::getcDeterminant()
+{
+	complex<double> result=0;
+	int *p = new int [nRows+1];
+		Matrix copy = *this;
+		 if(LUPDecompose(copy.cvalues,nRows,0.001,p)){
+			 result= LUPDeterminant(copy.cvalues,p,nRows);
 
+		 }
+return result;
 }
 /* INPUT: A - array of pointers to rows of a square matrix having dimension N
  *        Tol - small tolerance number to detect failure when the matrix is near degenerate
@@ -479,6 +611,69 @@ double LUPDeterminant(double **A, int *P, int N) {
         return -det;
 }
 
+int LUPDecompose(complex<double> **A, int N, double Tol, int *P) {
+
+    int i, j, k, imax;
+    complex<double> *ptr;
+		double maxA,absA;
+    for (i = 0; i <= N; i++)
+        P[i] = i; //Unit permutation matrix, P[N] initialized with N
+
+    for (i = 0; i < N; i++) {
+        maxA = 0.0;
+        imax = i;
+
+        for (k = i; k < N; k++)
+            if ((absA = std::abs(A[k][i])) > maxA) {
+                maxA = absA;
+                imax = k;
+            }
+
+        if (maxA < Tol) return 0; //failure, matrix is degenerate
+
+        if (imax != i) {
+            //pivoting P
+            j = P[i];
+            P[i] = P[imax];
+            P[imax] = j;
+
+            //pivoting rows of A
+            ptr = A[i];
+            A[i] = A[imax];
+            A[imax] = ptr;
+
+            //counting pivots starting from N (for determinant)
+            P[N]++;
+        }
+
+        for (j = i + 1; j < N; j++) {
+            A[j][i] /= A[i][i];
+
+            for (k = i + 1; k < N; k++)
+                A[j][k] -= A[j][i] * A[i][k];
+        }
+    }
+
+    return 1;  //decomposition done
+}
+
+/* INPUT: A,P filled in LUPDecompose; N - dimension.
+ * OUTPUT: Function returns the determinant of the initial matrix
+ */
+complex<double> LUPDeterminant(complex<double> **A, int *P, int N) {
+
+    complex<double> det = A[0][0];
+
+    for (int i = 1; i < N; i++)
+        det *= A[i][i];
+
+    if ((P[N] - N) % 2 == 0)
+        return det;
+    else
+        return -det;
+}
+
+
 
 Matrix Matrix::rdivide(double d, const Matrix& m)
 {
@@ -517,15 +712,11 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
 	double det_value = n.getDeterminant(); //determinant value of the matrix
-	Matrix m(nRows, nColumns); //cofactor matrix
+
 	if (det_value>0&&det_value<0.1)
-        {
-		int x=NAN;
-		m=x;
-		return m;
-	}
+        {throw ("Determinant is zero");}
 
-
+	Matrix m(nRows, nColumns); //cofactor matrix
 	int sign_c =1;
 	int sign_r=1;
 
@@ -741,7 +932,7 @@ Matrix Matrix::sqrt(Matrix&s)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-            m.values[iR][iC]=std::sqrt(s.values[iR][iC]);
+            m.values[iR][iC]=std::log(s.values[iR][iC]);
 		}
     }
     return m;
@@ -753,7 +944,7 @@ Matrix Matrix::cbrt(Matrix&s)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-            m.values[iR][iC]=std::cbrt(s.values[iR][iC]);
+            m.values[iR][iC]=std::log(s.values[iR][iC]);
 		}
     }
     return m;
@@ -826,15 +1017,150 @@ Matrix Matrix::ceil(Matrix&s)
     }
     return m;
 }
+//complex implementation
 
-//Matrix Matrix::rdivide(const Matrix& m1, const Matrix& m2) //not yet implemented
-//{
-//    if (m1.nRows != m2.nRows || m1.nColumns != m2.nColumns)
-//		throw("Invalid matrix dimension");
-//
-//    Matrix result;
-//
-//
-//    return result;
-//
-//}
+
+
+
+complex<double> Matrix::complex_parser(const string cs){
+			string x=cs;double R=0,I=0;
+			 if(cs.find('+')!=-1){
+				R=atof((x.substr(0,x.find('+')+1)).c_str());
+				x=x.substr(x.find('+'));
+			}
+			else if(x.find('-')!=-1){
+				R=atof((x.substr(0,x.find('-')+1)).c_str());
+				x=x.substr(x.find('-'));
+			}
+			if(x.find('i')!=-1){
+				if(x.find('i')==1){
+					x=x.substr(0,1);
+					I=atof(x.c_str());
+				}
+                else if(x.find('i')==0)I=1;
+				else {
+				x=x.substr(0,x.length()-1);
+				I=atof(x.c_str());
+				}
+			}
+			else if(x.find('I')!=-1){
+				if(x.find('I')==1){
+					x=x.substr(0,1);
+					I=atof(x.c_str());
+				}
+				else if(x.find('I')==0)I=1;
+				else {
+				x=x.substr(0,x.length()-1);
+				I=atof(x.c_str());
+				}
+			}
+			else R=atof(cs.c_str());
+			complex<double> c(R,I);
+			return c;
+}
+
+Matrix::Matrix(const string type,const string s)
+{
+	nRows = nColumns = 0;
+	cvalues = NULL;
+	this->type=type;
+	copy(type,s);
+}
+void Matrix::copy(string type,string s)
+{
+reset();
+values=NULL;
+	char* buffer = new char[s.length() + 1];
+	strncpy(buffer, s.c_str(), s.length() + 1); //copying the input string to a buffer because strtok will destruct it.
+
+	const char* lineSeparators = ";\r\n"; //separators used to indicate a ln has been terminated
+	char* line = strtok(buffer, lineSeparators); //tokenizes the first ln
+     	char* Remainlines = strtok(NULL, ""); //tokenizes the remaining lns
+
+	while (line) //line here is my token
+	{
+		Matrix row; //empty matrix
+		row.type=type;
+	        const char* separators = " []"; //row separator is space
+						//while [] are used for the first and last rows only (as they have to be removed)
+		char* token = strtok(line, separators); //tokenizes the line into numbers (still in a string form)
+
+		while (token) //the token here is the ln I'm extracting numbers from
+		{
+			const complex<double> token_value=complex_parser(token); //converts the tokens into doubles
+
+			Matrix item;
+			item = (const complex<double>)token_value; //filling the matrix with numbers
+			row.addColumn(item); //add each item in its correct column in the (row) matrix
+
+			token = strtok(NULL, separators); //gets the next token (or number in our case)
+
+		}
+
+		if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
+			addRow(row); //add this row to "this"
+
+	        line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
+        	Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
+	}
+
+	delete[] buffer;
+}
+Matrix::Matrix(complex<double> d)
+{
+	nRows = nColumns = 0;
+	cvalues = NULL;
+	copy(d);
+}
+void Matrix::copy(complex<double> d)
+{
+	reset();
+	this->nRows = 1;
+	this->nColumns = 1;
+	this->type="complex";
+	cvalues = new complex<double>*[1];
+	cvalues[0] = new complex<double>[1];
+	cvalues[0][0] = d;
+}
+Matrix Matrix::operator=(const complex<double> d) { copy(d);return *this; }
+
+Matrix::Matrix(string type,int nRows, int nColumns, int initialization, complex<double> initializationValue)
+{
+	this->nRows = nRows;
+	this->nColumns = nColumns;
+	this->type=type;
+	if ((nRows*nColumns) == 0)
+	{
+		cvalues=NULL;
+		return;
+	}
+	if(type=="complex")
+    {
+    values = NULL;
+	cvalues = new complex<double>*[nRows];
+	for (int iR = 0;iR<nRows;iR++)
+	{
+		cvalues[iR] = new complex<double>[nColumns];
+		for (int iC = 0;iC<nColumns;iC++)
+		{
+			switch (initialization)
+			{
+			case MI_ZEROS:
+				cvalues[iR][iC] = 0;
+				break;
+			case MI_ONES:
+				cvalues[iR][iC] = 1;
+				break;
+			case MI_EYE:
+				cvalues[iR][iC] = (iR == iC) ? 1 : 0;
+				break;
+			case MI_RAND: cvalues[iR][iC] = (rand() % 1000000) / 1000000.0;
+				break;
+			case MI_VALUE:
+				cvalues[iR][iC] = initializationValue;
+				break;
+			}
+		}
+	}
+   }
+}
