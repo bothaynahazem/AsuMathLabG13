@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "stdarg.h"
 #include <cmath>
-
+#include <complex>
 using namespace std;
 
 int LUPDecompose(double **A, int N, double Tol, int *P);
@@ -18,6 +18,9 @@ class Matrix
 {
 	int nRows, nColumns;
 	double** values;
+	complex<double>** cvalues;
+	string type;
+
 
 public:
 	Matrix(); //default constructor
@@ -27,16 +30,20 @@ public:
 
 	/*constructors*/
 	Matrix(int nRows, int nColumns, int initialization = MI_ZEROS, double initializationValue = 0.0);
+	Matrix(string type,int nRows, int nColumns, int initialization=MI_ZEROS, complex<double> initializationValue=0);
 	Matrix(int nRows, int nColumns, double first, ...);
 	Matrix(Matrix& m);
 	Matrix(double d);
+	Matrix(complex<double> d);
 	Matrix(const string s);
-
+    Matrix(int nRows, int nColumns, complex<double> first, ...);
+    Matrix(const string type,const string s);
 	/*copy functions*/
 	void copy(const Matrix& m);
 	void copy(const double d);
+    void copy(complex<double> d);
 	void copy(const string s);
-
+    void copy(const string type,const string s);
 	void reset();
 
 	string getString();
@@ -64,6 +71,7 @@ public:
 	/*operators*/
 	Matrix operator=(const Matrix& m);
 	Matrix operator=(const double d);
+	Matrix operator=(const complex<double> d);
 	Matrix operator=(const string s);
 
 	void operator+=(Matrix& m);
@@ -318,8 +326,9 @@ example:
     static Matrix rpow(Matrix&s,double x);
     static Matrix exp(Matrix&s);
     static Matrix sqrt(Matrix&s);
-    static Matrix cbrt(Matrix&s);
+    static Matrix cubicrt(Matrix&s);
     static Matrix ceil(Matrix&s);
     static Matrix floor(Matrix&s);
+    static complex<double> complex_parser(const string cs);
 
 };

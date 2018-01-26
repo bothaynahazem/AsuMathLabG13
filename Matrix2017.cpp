@@ -11,6 +11,8 @@ Matrix::Matrix() //default constructor
 {
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues=NULL;
+	type="none";
 }
 
 Matrix::~Matrix() //default destructor
@@ -22,6 +24,7 @@ Matrix::Matrix(int nRows, int nColumns, int initialization, double initializatio
 {
 	this->nRows = nRows;
 	this->nColumns = nColumns;
+	cvalues=NULL;
 	if ((nRows*nColumns) == 0)
 	{
 		values = NULL;
@@ -77,10 +80,12 @@ Matrix::Matrix(int nRows, int nColumns, double first, ...)
 	va_end(va);
 }
 
+
 Matrix::Matrix(Matrix& m)
 {
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues=NULL;
 	copy(m);
 }
 
@@ -106,16 +111,33 @@ void Matrix::copy(const Matrix& m)
 	if ((nRows*nColumns) == 0)
 	{
 		values = NULL;
+		cvalues=NULL;
 		return;
 	}
-	values = new double*[nRows];
-	for (int iR = 0;iR<nRows;iR++)
-	{
+   if(m.type=="complex")
+   {
+     type="complex";
+	 cvalues = new complex<double>*[nRows];
+	 for (int iR = 0;iR<nRows;iR++)
+	 {
+		cvalues[iR] = new complex<double>[nColumns];
+		for (int iC = 0;iC<nColumns;iC++)
+		{
+			cvalues[iR][iC] = m.cvalues[iR][iC];
+		}
+	 }
+	}
+   else
+    {
+	 values = new double*[nRows];
+	 for (int iR = 0;iR<nRows;iR++)
+	 {
 		values[iR] = new double[nColumns];
 		for (int iC = 0;iC<nColumns;iC++)
 		{
 			values[iR][iC] = m.values[iR][iC];
 		}
+	 }
 	}
 }
 
@@ -170,15 +192,25 @@ void Matrix::copy(string s)
 }
 
 void Matrix::reset()
-{
+{   if(type=="complex")
+   {
+    if(cvalues)
+    {
+      for(int i=0;i<nRows;i++)
+        delete[] cvalues[i];
+    }
+		delete[] cvalues;
+   }
+    else
+    {
 	if (values)
-	{
 		for (int i = 0;i<nRows;i++)
 			delete[] values[i];
-		delete[] values;
-	}
+        delete[] values;
+    }
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues=NULL;
 }
 
 string Matrix::getString()
@@ -191,6 +223,9 @@ string Matrix::getString()
 			//cout << values[iR][iC] << " ";
 
 			char buffer[50]="";
+			if(this->type=="complex")
+            snprintf(buffer, 50, "(%g)+(%g)i\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
+            else
 			snprintf(buffer, 50, "%g\t", values[iR][iC]);
 			s += buffer;
 		}
@@ -346,7 +381,25 @@ void Matrix::setSubMatrix(int r, int c, Matrix& m)
 		throw("Invalid matrix dimension");
 	for (int iR = 0;iR<m.nRows;iR++)
 		for (int iC = 0;iC<m.nColumns;iC++)
+		{   if(this->type=="complex"&&m.type!="complex")
+		    cvalues[r + iR][c + iC] = m.values[iR][iC];
+		    else if(this->type!="complex"&&m.type=="complex")
+            {
+            //copy from values to cvalues first
+            if(values)
+            {
+            for (int rows = 0;iR<this->nRows;iR++)
+            for (int columns = 0;iC<this->nColumns;iC++)
+            cvalues[rows][columns] = values[rows][columns];
+            }
+        //copy from values to cvalues first
+            cvalues[r + iR][c + iC] = m.cvalues[iR][iC];
+            }
+            else if(this->type=="complex"&&m.type=="complex")
+              cvalues[r + iR][c + iC] = m.cvalues[iR][iC];
+            else
 			values[r + iR][c + iC] = m.values[iR][iC];
+		}
 }
 
 //extract a submatrix from matrix, r & c are row & column where we want to extract. nRows & nColumns are the rows & columns of the submatrix.
@@ -354,29 +407,60 @@ Matrix Matrix::getSubMatrix(int r, int c, int nRows, int nColumns)
 {
 	if ((r + nRows)>nRows || (c + nColumns)>nColumns)
 		throw("Invalid matrix dimension");
+		if(this->type=="complex")
+        {
+            Matrix m("complex",nRows, nColumns);
+	for (int iR = 0;iR<m.nRows;iR++)
+		for (int iC = 0;iC<m.nColumns;iC++)
+			m.cvalues[iR][iC] = cvalues[r + iR][c + iC];
+	return m;
+        }
+		else{
 	Matrix m(nRows, nColumns);
 	for (int iR = 0;iR<m.nRows;iR++)
 		for (int iC = 0;iC<m.nColumns;iC++)
 			m.values[iR][iC] = values[r + iR][c + iC];
 	return m;
+		}
 }
 
 //add column to matrix (m).
 void Matrix::addColumn(Matrix& m)
-{
+{   if(m.type=="complex")
+    {
+    Matrix n("complex",max(nRows, m.nRows), nColumns + m.nColumns);
+    n.setSubMatrix(0, 0, *this);
+	n.setSubMatrix(0, nColumns, m);
+	*this = n;
+    }
+    else
+    {
 	Matrix n(max(nRows, m.nRows), nColumns + m.nColumns);
 	n.setSubMatrix(0, 0, *this);
 	n.setSubMatrix(0, nColumns, m);
 	*this = n;
+    }
+
 }
 
 //add row to matrix (m).
 void Matrix::addRow(Matrix& m)
 {
-	Matrix n(nRows + m.nRows, max(nColumns, m.nColumns));
+    if(m.type=="complex")
+        {
+	Matrix n("complex",nRows + m.nRows, max(nColumns, m.nColumns));
 	n.setSubMatrix(0, 0, *this);
 	n.setSubMatrix(nRows, 0, m);
 	*this = n;
+        }
+	else
+      {
+    Matrix n(nRows + m.nRows, max(nColumns, m.nColumns));
+	n.setSubMatrix(0, 0, *this);
+	n.setSubMatrix(nRows, 0, m);
+	*this = n;
+      }
+
 }
 
 //return cofactor matrix, r & c are element's row & column which we want to get its cofactor.
@@ -385,6 +469,20 @@ Matrix Matrix::getCofactor(int r, int c)
 	//valid only for (2*2) matrices.
 	if (nRows <= 1 && nColumns <= 1)
 		throw("Invalid matrix dimension");
+		if(this->type=="complex")
+        {
+          Matrix m("complex",nRows - 1, nColumns - 1);
+	for (int iR = 0;iR<m.nRows;iR++)
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+			int sR = (iR<r) ? iR : iR + 1;
+			int sC = (iC<c) ? iC : iC + 1;
+			m.cvalues[iR][iC] = cvalues[sR][sC];
+		}
+		return m;
+        }
+        else
+        {
 	Matrix m(nRows - 1, nColumns - 1);
 	for (int iR = 0;iR<m.nRows;iR++)
 		for (int iC = 0;iC<m.nColumns;iC++)
@@ -393,7 +491,8 @@ Matrix Matrix::getCofactor(int r, int c)
 			int sC = (iC<c) ? iC : iC + 1;
 			m.values[iR][iC] = values[sR][sC];
 		}
-	return m;
+		return m;
+        }
 }
 
 //return the determinant of the matrix.
@@ -404,7 +503,6 @@ double Matrix::getDeterminant()
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.values,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.values,p,nRows);
-			 if(result>0 && result<0.01)result=0;
 			 return result;
 		 }
 
@@ -517,15 +615,11 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
 	double det_value = n.getDeterminant(); //determinant value of the matrix
-	Matrix m(nRows, nColumns); //cofactor matrix
+
 	if (det_value>0&&det_value<0.1)
-        {
-		int x=NAN;
-		m=x;
-		return m;
-	}
+        {throw ("Determinant is zero");}
 
-
+	Matrix m(nRows, nColumns); //cofactor matrix
 	int sign_c =1;
 	int sign_r=1;
 
@@ -546,6 +640,18 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 
 
 Matrix Matrix::getTranspose() {
+    if(this->type=="complex")
+    {
+    Matrix x("complex",nColumns, nRows);
+	for (int ir = 0; ir<x.nRows;ir++) {
+		for (int ic = 0; ic<x.nColumns;ic++) {
+			x.cvalues[ir][ic] = cvalues[ic][ir];
+		}
+	}
+	return x;
+    }
+    else
+    {
 	Matrix x(nColumns, nRows);
 	for (int ir = 0; ir<x.nRows;ir++) {
 		for (int ic = 0; ic<x.nColumns;ic++) {
@@ -553,9 +659,24 @@ Matrix Matrix::getTranspose() {
 		}
 	}
 	return x;
+    }
 }
 Matrix Matrix::sin(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::sin(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -565,21 +686,51 @@ Matrix Matrix::sin(Matrix&s)
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::cos(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::cos(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=std::cos(s.values[iR][iC]);
+            m.values[iR][iC]=std::cos(s.values[iR][iC]);
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::tan(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::tan(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -589,6 +740,7 @@ Matrix Matrix::tan(Matrix&s)
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::acos(Matrix&s)
 {
@@ -597,7 +749,7 @@ Matrix Matrix::acos(Matrix&s)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=std::acos(s.values[iR][iC]);
+            m.values[iR][iC]=std::acos(s.values[iR][iC]);
 		}
     }
     return m;
@@ -609,58 +761,103 @@ Matrix Matrix::asin(Matrix&s)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=std::asin(s.values[iR][iC]);
+            m.values[iR][iC]=std::asin(s.values[iR][iC]);
 		}
     }
     return m;
+
 }
 Matrix Matrix::atan(Matrix&s)
-{
-    Matrix m(s.nRows,s.nColumns);
+{    Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=std::atan(s.values[iR][iC]);
+            m.values[iR][iC]=std::atan(s.values[iR][iC]);
 		}
     }
     return m;
+
 }
 Matrix Matrix::sinh(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::sinh(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=std::sinh(s.values[iR][iC]);
+            m.values[iR][iC]=std::sinh(s.values[iR][iC]);
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::cosh(Matrix&s)
-{
+{if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::cosh(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=std::cosh(s.values[iR][iC]);
+            m.values[iR][iC]=std::cosh(s.values[iR][iC]);
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::tanh(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::tanh(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=std::tanh(s.values[iR][iC]);
+            m.values[iR][iC]=std::tanh(s.values[iR][iC]);
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::a_sinh(Matrix&s)
 {
@@ -669,37 +866,49 @@ Matrix Matrix::a_sinh(Matrix&s)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=asinh(s.values[iR][iC]);
+            m.values[iR][iC]=asinh(s.values[iR][iC]);
 		}
     }
     return m;
 }
 Matrix Matrix::a_cosh(Matrix&s)
-{
-    Matrix m(s.nRows,s.nColumns);
+{   Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=acosh(s.values[iR][iC]);
+            m.values[iR][iC]=acosh(s.values[iR][iC]);
 		}
     }
     return m;
+
 }
 Matrix Matrix::a_tanh(Matrix&s)
-{
-    Matrix m(s.nRows,s.nColumns);
+{   Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-		    m.values[iR][iC]=atanh(s.values[iR][iC]);
+            m.values[iR][iC]=atanh(s.values[iR][iC]);
 		}
     }
     return m;
 }
 Matrix Matrix::log(Matrix&s)
-{
+{if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::log(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -709,9 +918,24 @@ Matrix Matrix::log(Matrix&s)
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::log10(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::log10(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -721,9 +945,24 @@ Matrix Matrix::log10(Matrix&s)
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::exp(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::exp(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -733,9 +972,23 @@ Matrix Matrix::exp(Matrix&s)
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::sqrt(Matrix&s)
-{
+{if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::sqrt(s.cvalues[iR][iC]);
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -745,21 +998,37 @@ Matrix Matrix::sqrt(Matrix&s)
 		}
     }
     return m;
+    }
 }
-Matrix Matrix::cbrt(Matrix&s)
+Matrix Matrix::cubicrt(Matrix&s)
 {
+
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-            m.values[iR][iC]=std::cbrt(s.values[iR][iC]);
+            m.values[iR][iC]=cbrt(s.values[iR][iC]);
 		}
     }
     return m;
+
 }
 Matrix Matrix::rpow(Matrix&s,double x)
 {
+    if(s.type=="complex")
+    {
+        Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC]=std::pow(s.cvalues[iR][iC],x);
+		}
+    }
+    return m;
+    }
+    else{
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -769,6 +1038,7 @@ Matrix Matrix::rpow(Matrix&s,double x)
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::pow(Matrix&s,double x)
 {
@@ -776,23 +1046,58 @@ Matrix Matrix::pow(Matrix&s,double x)
     if(x<-1)throw("Invalid Power");
     if(x==0)
     {
+        if(s.type=="complex")
+        {
+        Matrix m("complex",s.nRows,s.nColumns,MI_EYE);
+        return m;
+        }
+        else
+        {
         Matrix m(s.nRows,s.nColumns,MI_EYE);
         return m;
+        }
     }
     else if(x==1)
     {
+        if(s.type=="complex")
+        {
+
+        Matrix m("complex",s.nRows,s.nColumns);
+         m.copy(s);
+         return m;
+        }
+        else{
         Matrix m(s.nRows,s.nColumns);
          m.copy(s);
          return m;
+        }
     }
     else if(x==-1)
+    {  if(s.type=="complex")
     {
+        Matrix m("complex",s.nRows,s.nColumns);
+        m=s.getInverse();
+        return m;
+    }
+    else{
         Matrix m(s.nRows,s.nColumns);
         m=s.getInverse();
         return m;
     }
+    }
     else
     {
+        if(s.type=="complex")
+        {
+          Matrix m("complex",s.nRows,s.nColumns);
+         m.copy(s);
+         for(int i=1;i<x;i++)
+          {
+           m*=s;
+           }
+          return m;
+        }
+        else{
       Matrix m(s.nRows,s.nColumns);
       m.copy(s);
       for(int i=1;i<x;i++)
@@ -800,10 +1105,25 @@ Matrix Matrix::pow(Matrix&s,double x)
            m*=s;
         }
      return m;
+        }
     }
 }
 Matrix Matrix::floor(Matrix&s)
-{
+{if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC].real()=std::floor(s.cvalues[iR][iC].real());
+            m.cvalues[iR][iC].imag()=std::floor(s.cvalues[iR][iC].imag());
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -813,9 +1133,25 @@ Matrix Matrix::floor(Matrix&s)
 		}
     }
     return m;
+    }
 }
 Matrix Matrix::ceil(Matrix&s)
 {
+    if(s.type=="complex")
+    {
+Matrix m("complex",s.nRows,s.nColumns);
+    for (int iR = 0;iR<m.nRows;iR++)
+    {
+		for (int iC = 0;iC<m.nColumns;iC++)
+		{
+            m.cvalues[iR][iC].real()=std::ceil(s.cvalues[iR][iC].real());
+            m.cvalues[iR][iC].imag()=std::ceil(s.cvalues[iR][iC].imag());
+		}
+    }
+    return m;
+    }
+    else
+    {
     Matrix m(s.nRows,s.nColumns);
     for (int iR = 0;iR<m.nRows;iR++)
     {
@@ -825,16 +1161,153 @@ Matrix Matrix::ceil(Matrix&s)
 		}
     }
     return m;
+    }
+}
+//complex implementation
+
+
+
+
+complex<double> Matrix::complex_parser(const string cs){
+			string x=cs;double R=0,I=0;
+			 if(cs.find('+')!=-1){
+				R=atof((x.substr(0,x.find('+')+1)).c_str());
+				x=x.substr(x.find('+'));
+			}
+			else if(x.find('-')!=-1){
+				R=atof((x.substr(0,x.find('-')+1)).c_str());
+				x=x.substr(x.find('-'));
+			}
+			if(x.find('i')!=-1){
+				if(x.find('i')==1){
+					x=x.substr(0,1);
+					I=atof(x.c_str());
+				}
+                else if(x.find('i')==0)I=1;
+				else {
+				x=x.substr(0,x.length()-1);
+				I=atof(x.c_str());
+				}
+			}
+			else if(x.find('I')!=-1){
+				if(x.find('I')==1){
+					x=x.substr(0,1);
+					I=atof(x.c_str());
+				}
+				else if(x.find('I')==0)I=1;
+				else {
+				x=x.substr(0,x.length()-1);
+				I=atof(x.c_str());
+				}
+			}
+			else R=atof(cs.c_str());
+			complex<double> c(R,I);
+			return c;
 }
 
-//Matrix Matrix::rdivide(const Matrix& m1, const Matrix& m2) //not yet implemented
-//{
-//    if (m1.nRows != m2.nRows || m1.nColumns != m2.nColumns)
-//		throw("Invalid matrix dimension");
-//
-//    Matrix result;
-//
-//
-//    return result;
-//
-//}
+Matrix::Matrix(const string type,const string s)
+{
+	nRows = nColumns = 0;
+	cvalues = NULL;
+	this->type=type;
+	copy(type,s);
+}
+void Matrix::copy(string type,string s)
+{
+reset();
+values=NULL;
+	char* buffer = new char[s.length() + 1];
+	strncpy(buffer, s.c_str(), s.length() + 1); //copying the input string to a buffer because strtok will destruct it.
+
+	const char* lineSeparators = ";\r\n"; //separators used to indicate a ln has been terminated
+	char* line = strtok(buffer, lineSeparators); //tokenizes the first ln
+     	char* Remainlines = strtok(NULL, ""); //tokenizes the remaining lns
+
+	while (line) //line here is my token
+	{
+		Matrix row; //empty matrix
+		row.type=type;
+	        const char* separators = " []"; //row separator is space
+						//while [] are used for the first and last rows only (as they have to be removed)
+		char* token = strtok(line, separators); //tokenizes the line into numbers (still in a string form)
+
+		while (token) //the token here is the ln I'm extracting numbers from
+		{
+			const complex<double> token_value=complex_parser(token); //converts the tokens into doubles
+
+			Matrix item;
+			item = (const complex<double>)token_value; //filling the matrix with numbers
+			row.addColumn(item); //add each item in its correct column in the (row) matrix
+
+			token = strtok(NULL, separators); //gets the next token (or number in our case)
+
+		}
+
+		if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
+			addRow(row); //add this row to "this"
+
+	        line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
+        	Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
+	}
+
+	delete[] buffer;
+}
+Matrix::Matrix(complex<double> d)
+{
+	nRows = nColumns = 0;
+	cvalues = NULL;
+	copy(d);
+}
+void Matrix::copy(complex<double> d)
+{
+	reset();
+	this->nRows = 1;
+	this->nColumns = 1;
+	this->type="complex";
+	cvalues = new complex<double>*[1];
+	cvalues[0] = new complex<double>[1];
+	cvalues[0][0] = d;
+}
+Matrix Matrix::operator=(const complex<double> d) { copy(d);return *this; }
+
+Matrix::Matrix(string type,int nRows, int nColumns, int initialization, complex<double> initializationValue)
+{
+	this->nRows = nRows;
+	this->nColumns = nColumns;
+	this->type=type;
+	if ((nRows*nColumns) == 0)
+	{
+		cvalues=NULL;
+		return;
+	}
+	if(type=="complex")
+    {
+    values = NULL;
+	cvalues = new complex<double>*[nRows];
+	for (int iR = 0;iR<nRows;iR++)
+	{
+		cvalues[iR] = new complex<double>[nColumns];
+		for (int iC = 0;iC<nColumns;iC++)
+		{
+			switch (initialization)
+			{
+			case MI_ZEROS:
+				cvalues[iR][iC] = 0;
+				break;
+			case MI_ONES:
+				cvalues[iR][iC] = 1;
+				break;
+			case MI_EYE:
+				cvalues[iR][iC] = (iR == iC) ? 1 : 0;
+				break;
+			case MI_RAND: cvalues[iR][iC] = (rand() % 1000000) / 1000000.0;
+				break;
+			case MI_VALUE:
+				cvalues[iR][iC] = initializationValue;
+				break;
+			}
+		}
+	}
+   }
+}
+
