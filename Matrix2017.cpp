@@ -251,14 +251,26 @@ void Matrix::add(const Matrix& m)
 	for (int iR = 0; iR < nRows; iR++)
 	{
 		for (int iC = 0;iC < nColumns;iC++)
-			values[iR][iC] += m.values[iR][iC];
+    {
+      if((this->type=="complex") && (m.type=="complex"))
+        cvalues[iR][iC] += m.cvalues[iR][iC];
+      else if((this->type=="complex") && (m.type!="complex"))
+        cvalues[iR][iC] += m.values[iR][iC];
+      else if((this->type!="complex") && (m.type=="complex"))
+        cvalues[iR][iC] += m.cvalues[iR][iC];
+      else
+        values[iR][iC] += m.values[iR][iC];
+    }
+
 	}
 }
 
 void Matrix::operator+=(Matrix& m) { add(m); }
 void Matrix::operator+=(double d) { add(Matrix(nRows, nColumns, MI_VALUE, d)); }
+void Matrix::operator+=(complex<double> d) { add(Matrix("complex", nRows, nColumns, MI_VALUE, d)); }
 Matrix Matrix::operator+(Matrix& m) { Matrix r = *this;r += m;return r; }
 Matrix Matrix::operator+(double d) { Matrix r = *this;r += d;return r; }
+Matrix Matrix::operator+(complex<double> d) { Matrix r = *this;r += d;return r; }
 
 void Matrix::sub(const Matrix& m)
 {
@@ -267,14 +279,25 @@ void Matrix::sub(const Matrix& m)
 	for (int iR = 0;iR < nRows;iR++)
 	{
 		for (int iC = 0;iC < nColumns;iC++)
-			values[iR][iC] -= m.values[iR][iC];
+    {
+      if((this->type=="complex") && (m.type=="complex"))
+        cvalues[iR][iC] -= m.cvalues[iR][iC];
+      else if((this->type=="complex") && (m.type!="complex"))
+        cvalues[iR][iC] -= m.values[iR][iC];
+      else if((this->type!="complex") && (m.type=="complex"))
+        cvalues[iR][iC] -= m.cvalues[iR][iC];
+      else
+        values[iR][iC] -= m.values[iR][iC];
+    }
 	}
 }
 
 void Matrix::operator-=(Matrix& m) { sub(m); }
 void Matrix::operator-=(double d) { sub(Matrix(nRows, nColumns, MI_VALUE, d)); }
+void Matrix::operator-=(complex<double> d) { sub(Matrix("complex", nRows, nColumns, MI_VALUE, d)); }
 Matrix Matrix::operator-(Matrix& m) { Matrix r = *this;r -= m;return r; }
 Matrix Matrix::operator-(double d) { Matrix r = *this;r -= d;return r; }
+Matrix Matrix::operator-(complex<double> d) { Matrix r = *this;r -= d;return r; }
 
 void Matrix::mul(Matrix& m)
 {
@@ -712,20 +735,28 @@ complex<double> LUPDeterminant(complex<double> **A, int *P, int N) {
 
 Matrix Matrix::rdivide(double d, const Matrix& m)
 {
-    Matrix result(m.nRows,m.nColumns);
-
+	if(m.type=="complex")
+	{
+		Matrix result("complex",m.nRows,m.nColumns);
     for (int i=0; i<m.nRows; i++)
     {
         for (int j=0; j<m.nColumns; j++)
-        {
-            result.values[i][j] = ( d / m.values[i][j] );
-        }
+            result.cvalues[i][j] = ( d / m.cvalues[i][j] );
+		}
+		return result;
+	}
+	else if(m.type!="complex")
+	{
+		Matrix result(m.nRows,m.nColumns);
+		for (int i=0; i<m.nRows; i++)
+		{
+				for (int j=0; j<m.nColumns; j++)
+						result.values[i][j] = ( d / m.values[i][j] );
+		}
+		return result;
+	 }
 
-    }
-
-    return result;
 }
-
 istream& operator >> (istream &is, Matrix& m) //inputs the matrix through "cin>>" example: Matrix myMatrix; cin>>myMatrix;
 {
 	string s;
@@ -743,12 +774,14 @@ ostream& operator << (ostream &os, Matrix& m) //prints out the matrix elements u
 
 Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matrix
 {
+	if(type=="complex")
+	{
 	if (nRows != nColumns) //inverse can only be done on square matrices
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
-	double det_value = n.getDeterminant(); //determinant value of the matrix
+	complex<double> det_value = n.getDeterminant(); //determinant value of the matrix
 
-	if (det_value>0&&det_value<0.1)
+	if (abs(det_value)>0&&abs(det_value)<0.1)
         {throw ("Determinant is zero");}
 
 	Matrix m(nRows, nColumns); //cofactor matrix
@@ -760,14 +793,45 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
         sign_c=sign_r;
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-			m.values[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
+			m.cvalues[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
 			sign_c *=-1;//following sign rule in matrices
 		}
         sign_r*=-1;
     }
 	m=m.getTranspose();//transpose of cofactor matrix
-	m *= (1 / det_value);
+	m *= (1.0 / det_value);
 	return m;
+ }
+
+ if(type!="complex")
+ {
+ if (nRows != nColumns) //inverse can only be done on square matrices
+	 throw("Invalid Matrix Dimension");
+ Matrix n=*this;
+ double det_value = n.getDeterminant(); //determinant value of the matrix
+
+ if (det_value>0&&det_value<0.1)
+			 {throw ("Determinant is zero");}
+
+ Matrix m(nRows, nColumns); //cofactor matrix
+ int sign_c =1;
+ int sign_r=1;
+
+ for (int iR = 0;iR<m.nRows;iR++)
+	 {
+			 sign_c=sign_r;
+	 for (int iC = 0;iC<m.nColumns;iC++)
+	 {
+		 m.values[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
+		 sign_c *=-1;//following sign rule in matrices
+	 }
+			 sign_r*=-1;
+	 }
+ m=m.getTranspose();//transpose of cofactor matrix
+ m *= (1 / det_value);
+ return m;
+ }
+
 }
 
 
