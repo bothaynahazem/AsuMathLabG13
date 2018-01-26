@@ -78,6 +78,7 @@ public:
 
 	void operator+=(Matrix& m);
 	void operator+=(double d);
+        void operator+=(complex<double> d);
 	Matrix operator+();
 	Matrix operator+(Matrix& m);
 	/*
@@ -90,6 +91,7 @@ public:
 	*/
 
 	Matrix operator+(double d);
+	Matrix operator+(complex<double> d);
 	/*
     it used to:
     add a value to each element of the matrix the called the operator then outputs it
@@ -123,6 +125,7 @@ public:
 	a-=b;
 	*/
 	void operator-=(double d);
+	void operator-=(complex<double> d);
 	/*
 	it is used to:
 	subtract a double (d) from the matrix elements (this)
@@ -142,6 +145,7 @@ public:
 	a=a-b;
 	*/
 	Matrix operator-(double d);
+	Matrix operator-(complex<double> d);
 	/*
 	it is used to:
 	subtract double from matrix,, and return the result matrix
@@ -162,6 +166,7 @@ public:
 	a*=b;
 	*/
 	void operator*=(double d);
+	void operator*=(complex<double> d);
 	/*
 	it is used to:
 	multiply each element of (this) Matrix by double d then saves the result in (this) Matrix
@@ -182,6 +187,7 @@ example:
 	a=a*b;
 	*/
 	Matrix operator*(double d);
+	Matrix operator*(complex<double> d);
 	/*
 	it is used to:
 	multiply elements of (this) Matrix by double (d) and return the result Matrix
@@ -197,8 +203,11 @@ example:
 
 	void operator/=(Matrix& m);
 	void operator/=(double d);
+        void operator/=(complex<double> d);
 	Matrix operator/(Matrix& m);
 	Matrix operator/(double d);
+        Matrix operator/(complex<double> d);
+
 
 	Matrix operator++(); //Pre Increment
 	/*
