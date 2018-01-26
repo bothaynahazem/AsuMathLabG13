@@ -13,6 +13,8 @@ using namespace std;
 
 int LUPDecompose(double **A, int N, double Tol, int *P);
 double LUPDeterminant(double **A, int *P, int N);
+int LUPDecompose(complex<double> **A, int N, double Tol, int *P);
+complex<double> LUPDeterminant(complex<double> **A, int *P, int N);
 
 class Matrix
 {
@@ -330,5 +332,5 @@ example:
     static Matrix ceil(Matrix&s);
     static Matrix floor(Matrix&s);
     static complex<double> complex_parser(const string cs);
-
+	complex<double> getcDeterminant();
 };
