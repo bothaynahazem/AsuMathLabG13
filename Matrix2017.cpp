@@ -257,7 +257,7 @@ void Matrix::add(const Matrix& m)
       else if((this->type=="complex") && (m.type!="complex"))
         cvalues[iR][iC] += m.values[iR][iC];
       else if((this->type!="complex") && (m.type=="complex"))
-        cvalues[iR][iC] += m.cvalues[iR][iC];
+        cvalues[iR][iC] =values[iR][iC]+m.cvalues[iR][iC];
       else
         values[iR][iC] += m.values[iR][iC];
     }
@@ -285,7 +285,7 @@ void Matrix::sub(const Matrix& m)
       else if((this->type=="complex") && (m.type!="complex"))
         cvalues[iR][iC] -= m.values[iR][iC];
       else if((this->type!="complex") && (m.type=="complex"))
-        cvalues[iR][iC] -= m.cvalues[iR][iC];
+        cvalues[iR][iC] =values[iR][iC]-m.cvalues[iR][iC];
       else
         values[iR][iC] -= m.values[iR][iC];
     }
@@ -385,6 +385,13 @@ void Matrix::operator*=(double d)
 	for (int iR = 0;iR<nRows;iR++)
 		for (int iC = 0;iC<nColumns;iC++)
 			values[iR][iC] *= d;
+}
+void Matrix::operator*=(complex<double> d)
+{
+	type="complex";
+	for (int iR = 0;iR<nRows;iR++)
+		for (int iC = 0;iC<nColumns;iC++)
+			cvalues[iR][iC] *= d;
 }
 Matrix Matrix::operator*(Matrix& m) { Matrix r = *this;	r *= m;	return r; }
 Matrix Matrix::operator*(double d) { Matrix r = *this;	r *= d;	return r; }
