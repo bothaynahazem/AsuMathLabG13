@@ -554,7 +554,6 @@ Matrix Matrix::getCofactor(int r, int c)
 		return m;
         }
 }
-
 //return the determinant of the matrix.
 double Matrix::getDeterminant()
 {
@@ -563,10 +562,21 @@ double Matrix::getDeterminant()
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.values,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.values,p,nRows);
-			 return result;
+
 		 }
+return result;
+}
 
+complex<double> Matrix::getcDeterminant()
+{
+	complex<double> result=0;
+	int *p = new int [nRows+1];
+		Matrix copy = *this;
+		 if(LUPDecompose(copy.cvalues,nRows,0.001,p)){
+			 result= LUPDeterminant(copy.cvalues,p,nRows);
 
+		 }
+return result;
 }
 /* INPUT: A - array of pointers to rows of a square matrix having dimension N
  *        Tol - small tolerance number to detect failure when the matrix is near degenerate
@@ -627,6 +637,68 @@ int LUPDecompose(double **A, int N, double Tol, int *P) {
 double LUPDeterminant(double **A, int *P, int N) {
 
     double det = A[0][0];
+
+    for (int i = 1; i < N; i++)
+        det *= A[i][i];
+
+    if ((P[N] - N) % 2 == 0)
+        return det;
+    else
+        return -det;
+}
+
+int LUPDecompose(complex<double> **A, int N, double Tol, int *P) {
+
+    int i, j, k, imax;
+    complex<double> *ptr;
+		double maxA,absA;
+    for (i = 0; i <= N; i++)
+        P[i] = i; //Unit permutation matrix, P[N] initialized with N
+
+    for (i = 0; i < N; i++) {
+        maxA = 0.0;
+        imax = i;
+
+        for (k = i; k < N; k++)
+            if ((absA = std::abs(A[k][i])) > maxA) {
+                maxA = absA;
+                imax = k;
+            }
+
+        if (maxA < Tol) return 0; //failure, matrix is degenerate
+
+        if (imax != i) {
+            //pivoting P
+            j = P[i];
+            P[i] = P[imax];
+            P[imax] = j;
+
+            //pivoting rows of A
+            ptr = A[i];
+            A[i] = A[imax];
+            A[imax] = ptr;
+
+            //counting pivots starting from N (for determinant)
+            P[N]++;
+        }
+
+        for (j = i + 1; j < N; j++) {
+            A[j][i] /= A[i][i];
+
+            for (k = i + 1; k < N; k++)
+                A[j][k] -= A[j][i] * A[i][k];
+        }
+    }
+
+    return 1;  //decomposition done
+}
+
+/* INPUT: A,P filled in LUPDecompose; N - dimension.
+ * OUTPUT: Function returns the determinant of the initial matrix
+ */
+complex<double> LUPDeterminant(complex<double> **A, int *P, int N) {
+
+    complex<double> det = A[0][0];
 
     for (int i = 1; i < N; i++)
         det *= A[i][i];
