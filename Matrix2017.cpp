@@ -404,6 +404,7 @@ double Matrix::getDeterminant()
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.values,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.values,p,nRows);
+			 if(result>0 && result<0.01)result=0;
 			 return result;
 		 }
 
