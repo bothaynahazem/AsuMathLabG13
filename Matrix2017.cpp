@@ -77,21 +77,21 @@ Matrix::Matrix(int nRows, int nColumns, double first, ...)
 	va_end(va);
 }
 
-Matrix::Matrix(Matrix& m)
+Matrix::Matrix(const Matrix& m)
 {
 	nRows = nColumns = 0;
 	values = NULL;
 	copy(m);
 }
 
-Matrix::Matrix(string s)
+Matrix::Matrix(const string s)
 {
 	nRows = nColumns = 0;
 	values = NULL;
 	copy(s);
 }
 
-Matrix::Matrix(double d)
+Matrix::Matrix(const double d)
 {
 	nRows = nColumns = 0;
 	values = NULL;
@@ -119,7 +119,7 @@ void Matrix::copy(const Matrix& m)
 	}
 }
 
-void Matrix::copy(double d)
+void Matrix::copy(const double d)
 {
 	reset();
 	this->nRows = 1;
@@ -129,7 +129,7 @@ void Matrix::copy(double d)
 	values[0][0] = d;
 }
 
-void Matrix::copy(string s)
+void Matrix::copy(const string s)
 {
 	reset();
 
@@ -200,6 +200,28 @@ string Matrix::getString()
 	return s;
 }
 
+string Matrix::getAltString()
+{
+    string s="[";
+    for (int iR=0;iR<nRows;iR++)
+    {
+        for (int iC=0;iC<nColumns;iC++)
+        {
+            char buffer[50]="";
+            if(iC<nColumns-1)
+            snprintf(buffer,50,"%g ", values[iR][iC]);
+            else
+                 snprintf(buffer,50,"%g", values[iR][iC]);
+            s+= buffer;
+        }
+        if(iR < nRows-1)
+        s+= ';';
+        else
+        s+=']';
+    }
+    return s;
+}
+
 Matrix Matrix::operator=(const Matrix& m)
 {
 	copy(m);
@@ -207,7 +229,7 @@ Matrix Matrix::operator=(const Matrix& m)
 }
 
 Matrix Matrix::operator=(const double d) { copy(d);return *this; }
-Matrix Matrix::operator=(string s) { copy(s);return *this; }
+Matrix Matrix::operator=(const string s) { copy(s);return *this; }
 
 void Matrix::add(const Matrix& m)
 {

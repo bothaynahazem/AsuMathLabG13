@@ -28,7 +28,7 @@ public:
 	/*constructors*/
 	Matrix(int nRows, int nColumns, int initialization = MI_ZEROS, double initializationValue = 0.0);
 	Matrix(int nRows, int nColumns, double first, ...);
-	Matrix(Matrix& m);
+	Matrix(const Matrix& m);
 	Matrix(double d);
 	Matrix(const string s);
 
@@ -40,6 +40,7 @@ public:
 	void reset();
 
 	string getString();
+	string getAltString();
 
 	/*operations*/
 	void add(const Matrix& m);
