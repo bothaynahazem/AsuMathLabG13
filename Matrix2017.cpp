@@ -278,6 +278,64 @@ Matrix Matrix::operator-(double d) { Matrix r = *this;r -= d;return r; }
 
 void Matrix::mul(Matrix& m)
 {
+	if(this->type=="complex"&& m.type=="complex"){
+
+	if (nColumns != m.nRows) //that's how matrices are multiplied
+		throw("Invalid matrix dimension for multiplication");
+
+	Matrix r("complex",nRows, m.nColumns); //the dim of the product matrix
+
+	for (int iR = 0; iR<r.nRows; iR++)
+	{
+		for (int iC = 0; iC < r.nColumns; iC++)
+		{
+			r.cvalues[iR][iC] = 0; //initializing this particular element of the matrix with zero
+
+			for (int k = 0; k < m.nColumns; k++)
+				r.cvalues[iR][iC] += cvalues[iR][k] * m.cvalues[k][iC];
+		}
+	}
+ copy(r);
+}
+else if(this->type=="complex" && m.type!="complex"){
+
+	if (nColumns != m.nRows) //that's how matrices are multiplied
+		throw("Invalid matrix dimension for multiplication");
+
+	Matrix r("complex",nRows, m.nColumns); //the dim of the product matrix
+
+	for (int iR = 0; iR<r.nRows; iR++)
+	{
+		for (int iC = 0; iC < r.nColumns; iC++)
+		{
+			r.cvalues[iR][iC] = 0; //initializing this particular element of the matrix with zero
+
+			for (int k = 0; k < m.nColumns; k++)
+				r.cvalues[iR][iC] += cvalues[iR][k] * m.values[k][iC];
+		}
+	}
+ copy(r);
+}
+else if(this->type!="complex" && m.type=="complex"){
+
+	if (nColumns != m.nRows) //that's how matrices are multiplied
+		throw("Invalid matrix dimension for multiplication");
+
+	Matrix r("complex",nRows, m.nColumns); //the dim of the product matrix
+
+	for (int iR = 0; iR<r.nRows; iR++)
+	{
+		for (int iC = 0; iC < r.nColumns; iC++)
+		{
+			r.cvalues[iR][iC] = 0; //initializing this particular element of the matrix with zero
+
+			for (int k = 0; k < m.nColumns; k++)
+				r.cvalues[iR][iC] += values[iR][k] * m.cvalues[k][iC];
+		}
+	}
+ copy(r);
+}
+else{
 	if (nColumns != m.nRows) //that's how matrices are multiplied
 		throw("Invalid matrix dimension for multiplication");
 
@@ -293,7 +351,9 @@ void Matrix::mul(Matrix& m)
 				r.values[iR][iC] += values[iR][k] * m.values[k][iC];
 		}
 	}
+
 	copy(r);
+}
 }
 
 void Matrix::operator*=(Matrix& m) { mul(m); }
