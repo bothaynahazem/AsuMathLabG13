@@ -140,7 +140,6 @@ void Matrix::copy(const Matrix& m)
 	 }
 	}
 }
-
 void Matrix::copy(double d)
 {
 	reset();
