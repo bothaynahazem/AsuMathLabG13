@@ -268,7 +268,7 @@ example:
      --> 1./A <-- for example
      dividing 1 by every element in the array A
     */
-	Matrix rdivide(const Matrix& m1, const Matrix& m2);
+	Matrix rdivide(const Matrix& s, const Matrix& m);
     /*more complex right array division
      --> A./B <-- for example
      dividing every element in A by every corresponding element in the array B
