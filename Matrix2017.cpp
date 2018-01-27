@@ -786,10 +786,15 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 	if (nRows != nColumns) //inverse can only be done on square matrices
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
-	complex<double> det_value = n.getcDeterminant(); //determinant value of the matrix
 
-	if (abs(det_value)>0&&abs(det_value)<0.1)
-        {throw ("Determinant is zero");}
+	complex<double> det_value = n.getcDeterminant(); //determinant value of the matrix
+    Matrix m(nRows, nColumns); //cofactor matrix
+	if (det_value==0)
+        {
+		int x=NAN;
+		m=x;
+		return m;
+	}
 
 	Matrix m("complex",nRows, nColumns); //cofactor matrix
 	double sign_c =1;
