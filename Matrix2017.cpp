@@ -591,9 +591,9 @@ double Matrix::getDeterminant()
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.values,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.values,p,nRows);
-
+			if(result>0 && result<0.01)result=0;
+			 return result;
 		 }
-return result;
 }
 
 complex<double> Matrix::getcDeterminant()
@@ -603,9 +603,10 @@ complex<double> Matrix::getcDeterminant()
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.cvalues,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.cvalues,p,nRows);
-
+			 if(result>0 && result<0.01)result=0;
+			 return result;
 		 }
-return result;
+
 }
 /* INPUT: A - array of pointers to rows of a square matrix having dimension N
  *        Tol - small tolerance number to detect failure when the matrix is near degenerate
@@ -867,8 +868,13 @@ Matrix m("complex",nRows, nColumns); //cofactor matrix
  Matrix n=*this;
  double det_value = n.getDeterminant(); //determinant value of the matrix
 
- if (det_value>0&&det_value<0.1)
-			 {throw ("Determinant is zero");}
+ if (det_value==0.0)
+        {
+		double x=NAN;
+		m=x;
+		return m;
+	}
+
 
  Matrix m(nRows, nColumns); //cofactor matrix
  int sign_c =1;
@@ -1369,7 +1375,7 @@ Matrix m("complex",s.nRows,s.nColumns);
     {
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-						complex<double> x(std::floor(s.cvalues[iR][iC].real()),std::floor(s.cvalues[iR][iC].imag()));
+	complex<double> x(std::floor(s.cvalues[iR][iC].real()),std::floor(s.cvalues[iR][iC].imag()));
             m.cvalues[iR][iC]=x;
 
 		}
