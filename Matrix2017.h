@@ -50,6 +50,7 @@ public:
 
 	string getString();
   string getAltString();
+  string getAltStringNoB();
 	/*operations*/
 	void add(const Matrix& m);
 	void sub(const Matrix& m);
@@ -316,6 +317,7 @@ example:
 	};
 
 	double getDeterminant();
+	double getdDeterminant();
 	Matrix getTranspose();
 	Matrix getInverse();
 	Matrix div(Matrix &m);
