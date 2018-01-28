@@ -1451,8 +1451,10 @@ complex<double> Matrix::complex_parser(const string cs){
 			}
 			if(x.find('i')!=-1){
 				if(x.find('i')==1){
-					x=x.substr(0,1);
-					I=atof(x.c_str());
+					if(x[0]=='+')
+					I=1;
+					else if(x[0]=='-')
+                    I=-1;
 				}
                 else if(x.find('i')==0)I=1;
 				else {
@@ -1460,10 +1462,12 @@ complex<double> Matrix::complex_parser(const string cs){
 				I=atof(x.c_str());
 				}
 			}
-			else if(x.find('I')!=-1){
+            else if(x.find('I')!=-1){
 				if(x.find('I')==1){
-					x=x.substr(0,1);
-					I=atof(x.c_str());
+					if(x[0]=='+')
+					I=1;
+					else if(x[0]=='-')
+                    I=-1;
 				}
 				else if(x.find('I')==0)I=1;
 				else {
