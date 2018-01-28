@@ -38,18 +38,18 @@ public:
 	Matrix(double d);
 	Matrix(complex<double> d);
 	Matrix(const string s);
-    Matrix(int nRows, int nColumns, complex<double> first, ...);
-    Matrix(const string type,const string s);
+  Matrix(int nRows, int nColumns, complex<double> first, ...);
+  Matrix(const string type,const string s);
 	/*copy functions*/
 	void copy(const Matrix& m);
 	void copy(const double d);
-    void copy(complex<double> d);
+  void copy(complex<double> d);
 	void copy(const string s);
-    void copy(const string type,const string s);
+  void copy(const string type,const string s);
 	void reset();
 
 	string getString();
-
+  string getAltString();
 	/*operations*/
 	void add(const Matrix& m);
 	void sub(const Matrix& m);
@@ -268,7 +268,7 @@ example:
      --> 1./A <-- for example
      dividing 1 by every element in the array A
     */
-	Matrix rdivide(const Matrix& s, const Matrix& m);
+	Matrix rdivide(const Matrix& m1, const Matrix& m2);
     /*more complex right array division
      --> A./B <-- for example
      dividing every element in A by every corresponding element in the array B
