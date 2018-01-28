@@ -80,7 +80,8 @@ string replaceSin(string s)
 		int lengthOfSin = x1.length()+5;
 		int start = (s.find("sin"));
 		Matrix Y(evaluate(x1));
-		Matrix x(Matrix::sin(Y));
+		Matrix x;
+		x=Matrix::sin(Y);
 //		char buffer[100];
 //		sprintf(buffer, "%f", x);
 //		string xstr = buffer;
@@ -109,7 +110,8 @@ string replaceCos(string s)
 		int lengthOfCos = x1.length()+5;
 		int start = (s.find("cos"));
 		Matrix Y(evaluate(x1));
-		Matrix x(Matrix::cos(Y));
+         Matrix x;
+		x=Matrix::cos(Y);
 //		char buffer[100];
 //		sprintf(buffer, "%f", x);
 //		string xstr = buffer;
@@ -139,7 +141,8 @@ string replaceTan(string s)
 		int lengthOfTan = x1.length()+5;
 		int start = (s.find("tan"));
 		Matrix Y(evaluate(x1));
-		Matrix x(Matrix::tan(Y));
+		Matrix x;
+		x=Matrix::tan(Y);
 //		char buffer[100];
 //		sprintf(buffer, "%f", x);
 //		string xstr = buffer;
@@ -168,7 +171,8 @@ string replaceLog(string s)
 		int lengthOfLog10 = x1.length()+7;
 		int start = (s.find("log10"));
 		Matrix Y(evaluate(x1));
-		Matrix x(Matrix::log10(Y));
+		Matrix x;
+		x=Matrix::log10(Y);
 //		char buffer[100];
 //		sprintf(buffer, "%f", x);
 //		string xstr = buffer;
@@ -199,7 +203,8 @@ string replaceLn(string s)
 		int lengthOfLn = x1.length()+5;
 		int start = (s.find("tan"));
 		Matrix Y(evaluate(x1));
-		Matrix x(Matrix::log(Y));
+		Matrix x;
+		x=Matrix::log(Y);
 //		char buffer[100];
 //		sprintf(buffer, "%f", x);
 //		string xstr = buffer;
@@ -230,7 +235,8 @@ string replaceExp(string s)
 		int lengthOfExp = x1.length()+5;
 		int start = (s.find("exp"));
 		Matrix Y(evaluate(x1));
-		Matrix x(Matrix::exp(Y));
+		Matrix x;
+		x=Matrix::exp(Y);
 //		char buffer[100];
 //		sprintf(buffer, "%f", x);
 //		string xstr = buffer;
@@ -260,7 +266,8 @@ string replaceSqrt(string s)
 		int lengthOfSqrt = x1.length()+6;
 		int start = (s.find("sqrt"));
 		Matrix Y(evaluate(x1));
-		Matrix x(Matrix::sqrt(Y));
+		Matrix x;
+		x=Matrix::sqrt(Y);
 //		char buffer[100];
 //		sprintf(buffer, "%f", x);
 //		string xstr = buffer;
@@ -506,7 +513,8 @@ for (int i=0; i<s1.length();i++)
 					string ch = operators.top(); operators.pop();
 					Matrix op2 = operands.top(); operands.pop();
 					Matrix op1 = operands.top(); operands.pop();
-                    Matrix H(solve(op1, op2, ch));
+					Matrix H;
+                    H=solve(op1, op2, ch);
 					operands.push(H);
 				}
 				operators.pop();
