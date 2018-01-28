@@ -707,6 +707,22 @@ return value;   //return;
 
 }
 
+double Matrix::getdDeterminant()
+{
+    //valid only when rows=columns.
+if (nRows != nColumns)
+    throw("Invalid matrix dimension");
+if (nRows == 1 && nColumns == 1)return values[0][0];
+double value = 0;
+double m = 1.0;
+for (int iR = 0;iR<nRows;iR++)
+{
+    value += m * values[0][iR] * getCofactor(0, iR).getdDeterminant();
+    m *= -1;
+}
+return value;
+}
+
 /* INPUT: A - array of pointers to rows of a square matrix having dimension N
  *        Tol - small tolerance number to detect failure when the matrix is near degenerate
  * OUTPUT: Matrix A is changed, it contains both matrices L-E and U as A=(L-E)+U such that P*A=L*U.
