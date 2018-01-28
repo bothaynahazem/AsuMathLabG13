@@ -692,16 +692,21 @@ double Matrix::getDeterminant()
 
 complex<double> Matrix::getcDeterminant()
 {
-	complex<double> result=0;
-	int *p = new int [nRows+1];
-		Matrix copy = *this;
-		 if(LUPDecompose(copy.cvalues,nRows,0.001,p)){
-			 result= LUPDeterminant(copy.cvalues,p,nRows);
-			 if(std::abs(result)>0.0 && std::abs(result)<0.01)result=0;
-			 return result;
-		 }
+	//valid only when rows=columns.
+if (nRows != nColumns)
+	throw("Invalid matrix dimension");
+if (nRows == 1 && nColumns == 1)return cvalues[0][0];
+complex<double> value = 0;
+double m = 1.0;
+for (int iR = 0;iR<nRows;iR++)
+{
+	value += m * cvalues[0][iR] * getCofactor(0, iR).getcDeterminant();
+	m *= -1;
+}
+return value;   //return;
 
 }
+
 /* INPUT: A - array of pointers to rows of a square matrix having dimension N
  *        Tol - small tolerance number to detect failure when the matrix is near degenerate
  * OUTPUT: Matrix A is changed, it contains both matrices L-E and U as A=(L-E)+U such that P*A=L*U.
