@@ -517,6 +517,16 @@ Matrix Matrix::rdivide(double d, const Matrix& m)
 
     return result;
 }
+Matrix Matrix::rdivide(const Matrix&s, const Matrix& m)
+{
+    Matrix result(m.nRows,m.nColumns);
+		for (int i=0; i<m.nRows; i++)
+		{
+				for (int j=0; j<m.nColumns; j++)
+						result.values[i][j] = ( s.values[i][j] / m.values[i][j] );
+		}
+return result;
+}
 
 istream& operator >> (istream &is, Matrix& m) //inputs the matrix through "cin>>" example: Matrix myMatrix; cin>>myMatrix;
 {

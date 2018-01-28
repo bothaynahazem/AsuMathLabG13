@@ -73,7 +73,7 @@ string replaceSin(string s)
 {
 	if (s.find("sin")!=string::npos)
 	{
-	    string mat_name ="X";
+	    string mat_name ="ST";
 		int begin = s.find('(', s.find("sin"));
 		int end = s.find(')', begin+1);
 		string x1 = s.substr(begin+1 , end-begin-1);
@@ -102,7 +102,7 @@ string replaceCos(string s)
 {
 	if (s.find("cos") != string::npos)
 	{
-	    string mat_name ="X";
+	    string mat_name ="CT";
 		int begin = s.find('(', s.find("cos"));
 		int end = s.find(')', begin+1);
 		string x1 = s.substr(begin+1 , end-begin-1);
@@ -132,7 +132,7 @@ string replaceTan(string s)
 {
 	if (s.find("tan") != string::npos)
 	{
-	    string mat_name ="X";
+	    string mat_name ="TT";
 		int begin = s.find('(', s.find("tan"));
 		int end = s.find(')', begin+1);
 		string x1 = s.substr(begin+1 , end-begin-1);
@@ -161,7 +161,7 @@ string replaceLog(string s)
 {
 	if (s.find("log10") != string::npos)
 {
-        string mat_name ="X";
+        string mat_name ="LT";
 		int begin = s.find('(', s.find("log10"));
 		int end = s.find(')', begin+1);
 		string x1 = s.substr(begin+1 , end-begin-1);
@@ -192,7 +192,7 @@ string replaceLn(string s)
 {
 	if (s.find("log") != string::npos)
     {
-	    string mat_name ="X";
+	    string mat_name ="LLT";
 		int begin = s.find('(', s.find("log"));
 		int end = s.find(')', begin+1);
 		string x1 = s.substr(begin+1 , end-begin-1);
@@ -223,7 +223,7 @@ string replaceExp(string s)
 {
 	if (s.find("exp") != string::npos)
 	{
-	    string mat_name ="X";
+	    string mat_name ="ET";
 		int begin = s.find('(', s.find("exp"));
 		int end = s.find(')', begin+1);
 		string x1 = s.substr(begin+1 , end-begin-1);
@@ -253,7 +253,7 @@ string replaceSqrt(string s)
 {
 	if (s.find("sqrt") != string::npos)
 	{
-	    string mat_name ="X";
+	    string mat_name ="SST";
 		int begin = s.find('(', s.find("sqrt"));
 		int end = s.find(')', begin+1);
 		string x1 = s.substr(begin+1 , end-begin-1);
@@ -303,7 +303,7 @@ bool isChar(string s)
 
 bool isLetter(string s)
 {
-    if (s[0]>'A' && s[0]<'Z')
+    if (s[0]>='A' && s[0]<='Z')
         return true;
     else
         return false;
@@ -325,14 +325,19 @@ Matrix solve(Matrix op1,Matrix op2, string ch)
 	case '/': if(op2.getn()!=1) X = op1.div(op2);
               else X = op1/op2.getDeterminant();
 	     return X;
-	case '^': X = Matrix::pow(op1,op2.getDeterminant());
+	case '^': if (op2.getn()==1 && op1.getn()==1)
+        X = pow(op1.getDeterminant(),op2.getDeterminant());
+        else if(op2.getn()==1)
+	    X = Matrix::pow(op1,op2.getDeterminant());
 	    return X;
     case '.': if(ch[1]=='+') X = op1+op2.getDeterminant();
 	else if(ch[1]=='-') X = op1-op2.getDeterminant();
     else if(ch[1]=='*') X = op1*op2.getDeterminant();
     else if(ch[1]=='/')if(op2.getn()==1) X = op1/op2.getDeterminant();
-                        else X = op1.rdivide(op1.getDeterminant(),op2);
-    else if(ch[1]=='^') X = Matrix::rpow(op1,op2.getDeterminant());
+                        else if(op1.getn()==1) X = op1.rdivide(op1.getDeterminant(),op2);
+                        else X = op1.rdivide(op1,op2);
+    else if(ch[1]=='^') if (op2.getn()==1)
+        X = Matrix::rpow(op1,op2.getDeterminant());
     return X;
 
 	}
@@ -362,7 +367,9 @@ string evaluate(string s1)
 	stack<Matrix> operands;
 	string result;
 	string s;
-
+	for (int i=0; i<s1.length();i++)
+        if(s1[i]==' ')
+        s1.erase(i,1);
 	if(s1[0]=='-')
         s1.insert(0,"0");
         for (int i=0; i<s1.length();i++)
@@ -561,16 +568,21 @@ string evaluate(string s1)
 //    variables_names[in_cntr] = "B";
 //    in_cntr++;
 //    string s = "-2";
-	string matrix_char;
+
+//    string G = "[0]";
+//	Matrix H(G);
+//	cout << H.getDeterminant() << endl;
 
 int main(int argc,char* argv[])
 {
+string matrix_char;
 ifstream infile(argv[1]);
 string contents[100];
 int numberoflines=0;
 int i=0;
 while(getline(infile,contents[i]))// getting file contents
     {
+
         int pos =contents[i].find("[");
         int nbracketso =0;
         int nbracketsc =0;
@@ -581,21 +593,22 @@ while(getline(infile,contents[i]))// getting file contents
             else if(contents[i][j]==']')
                 nbracketsc++;
         }
-//        cout << nbracketso << nbracketsc << endl;
         if(pos!=string::npos && nbracketso != nbracketsc)
         {
-			 getline(infile,contents[i+1]);
-			 contents[i]= contents[i] + contents[i+1];
-
+             getline(infile,contents[i+1]);
+             contents[i] = contents[i] + ";" + contents[i+1];
+//             if (contents[i].find_first_of("\t\n\r",0)!=contents[i][contents[i].length()-1])
+//                contents[i].replace(contents[i].find_first_of("\t\n\r",0),1," ");
         }
 
 
-        if(contents[i]==";")
-        {
-            i--;
-            numberoflines--;
-        }
- cout << contents[i] <<endl;
+//        if(contents[i]==";")
+//        {
+//            i--;
+//            numberoflines--;
+//        }
+       // cout << contents[i] <<endl;
+
         numberoflines++;
 
         i++;
@@ -604,21 +617,23 @@ while(getline(infile,contents[i]))// getting file contents
 
 
 	int pos1;
-
 for (i=0; i<numberoflines;i++)
 {
-
-
-	if (contents[i].find('[', 0) == string::npos && contents[i].find("ones", 0) == string::npos && contents[i].find("zeros", 0) == string::npos && contents[i].find("eye", 0) == string::npos && contents[i].find("rand", 0) == string::npos) //Only math expression
-	{
-	    if(contents[i].length()==1)
-          for (int j=0;j<100;j++)
+cout << contents[i] << endl;
+if(isLetter(contents[i]))
+          {
+            for (int j=0;j<100;j++)
             {
+                //cout << contents[i] << '=' << variables_names[j] << endl;
                 if(variables_names[j]==contents[i])
                 {
-                    cout << input_matrices[j];
+                    cout << variables_names[j] << input_matrices[j].getAltString();
+                    break;
                 }
             }
+          }
+	if (contents[i].find('[', 0) == string::npos && contents[i].find("ones", 0) == string::npos && contents[i].find("zeros", 0) == string::npos && contents[i].find("eye", 0) == string::npos && contents[i].find("rand", 0) == string::npos) //Only math expression
+	{
 	    string m;
 	    string e;
 		matrix_char = contents[i].substr(0, 1);
@@ -631,12 +646,10 @@ for (i=0; i<numberoflines;i++)
         variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
         in_cntr++;
-        cout << X << endl;
-
+        //cout << X << endl;
 	}
 	else if (contents[i].find('[', 0) != string::npos)
 	{
-
 	while (contents[i].find_first_of("+-*/^", contents[i].find('[', 0) + 1)!= string::npos) //find and replace all math expressions if square bracket is found
 	{
 		string d;
@@ -646,13 +659,35 @@ for (i=0; i<numberoflines;i++)
 		end = contents[i].find_first_of(" [];", pos1);
 		d = contents[i].substr(begin+1, end-begin-1);
 		contents[i].replace(begin+1, end - begin-1, evaluate(d));
-		cout << contents[i] <<endl;
+		//cout << contents[i] <<endl;
 	}
+	matrix_char = contents[i].substr(0,1);
+	for (int k=0;k<contents[i].length();k++)
+    {
+        if(isLetter(contents[i].substr(k,1)))
+        {
+            for (int j=0;j<100;j++)
+            {
+                //cout << variables_names[j] << '=' << input_matrices[j].getAltString() << endl;
+                if (contents[i].substr(k,1)==variables_names[j])
+                {
+
+                    contents[i].replace(k,1,input_matrices[j].getAltString());
+//                    cout << input_matrices[j].getAltString() << endl;
+//                    cout << contents[i] <<endl;
+                    break;
+                }
+
+            }
+        }
+    }
 	string x;
     x = contents[i].substr(contents[i].find('[',0),contents[i].rfind(']')-contents[i].find('[',0)+1);
     x = concatenate(x);
     Matrix X(x);
-    cout << X << endl;
+    input_matrices[in_cntr] = X;
+    variables_names[in_cntr] = matrix_char;
+    in_cntr++;
 	}
 
 	else if (contents[i].find("rand", 0) != string::npos)
@@ -664,6 +699,7 @@ for (i=0; i<numberoflines;i++)
 		variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
         in_cntr++;
+//        cout << X << endl;
 	}
 	else if (contents[i].find("eye", 0) != string::npos)
 	{
@@ -674,6 +710,7 @@ for (i=0; i<numberoflines;i++)
 		variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
         in_cntr++;
+//        cout << X << endl;
 	}
 	else if (contents[i].find("zeros", 0) != string::npos)
 	{
@@ -684,7 +721,7 @@ for (i=0; i<numberoflines;i++)
 		variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
         in_cntr++;
-        cout << X << endl;
+//        cout << X << endl;
 	}
 	else if (contents[i].find("ones", 0) != string::npos)
 	{
@@ -696,18 +733,23 @@ for (i=0; i<numberoflines;i++)
         variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
         in_cntr++;
+//        cout << X << endl;
 	}
+//	else if(isLetter(contents[i]))
+//          {
+//            for (int j=0;j<100;j++)
+//            {
+//                cout << contents[i] << '=' << variables_names[j] << endl;
+//                if(variables_names[j]==contents[i])
+//                {
+//                    cout << variables_names[j] << input_matrices[j].getAltString();
+//                    break;
+//                }
+//            }
+//          }
+
+cout << variables_names[in_cntr-1] << input_matrices[in_cntr-1].getAltString() << endl;
 	}
-    string G = "[0]";
-	Matrix H(G);
-	cout << H.getDeterminant() << endl;
-//	G = "[4 3 2]";
-//	Matrix Y(G);
-//	Y.addColumn(H);
-//	cout << Y.getAltString() << endl;
-
-
-
 
 
 return 0;
