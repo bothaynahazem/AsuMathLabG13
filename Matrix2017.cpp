@@ -142,12 +142,19 @@ void Matrix::copy(const Matrix& m)
 }
 void Matrix::copy(double d)
 {
-	reset();
 	this->nRows = 1;
 	this->nColumns = 1;
+	if (this->type=="complex")
+    {
+    cvalues = new complex<double>*[1];
+	cvalues[0] = new complex<double>[1];
+	cvalues[0][0] = d;
+    }
+    else{
 	values = new double*[1];
 	values[0] = new double[1];
 	values[0][0] = d;
+    }
 }
 
 void Matrix::copy(string s)
