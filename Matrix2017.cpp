@@ -223,8 +223,16 @@ string Matrix::getString()
 
 			char buffer[50]="";
 			if(this->type=="complex")
-            snprintf(buffer, 50, "(%g)+(%g)i\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
-            else
+			{
+				if (cvalues[iR][iC].imag()==0)
+					snprintf(buffer, 50, "%g\t", cvalues[iR][iC].real());
+				else if (cvalues[iR][iC].real()==0)
+					snprintf(buffer, 50, "%gi\t", cvalues[iR][iC].imag());
+				else if (cvalues[iR][iC].real()!=0 && cvalues[iR][iC].imag()<0)
+					snprintf(buffer, 50, "%g%gi\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
+				else
+					snprintf(buffer, 50, "%g+%gi\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
+      }else
 			snprintf(buffer, 50, "%g\t", values[iR][iC]);
 			s += buffer;
 		}
@@ -233,7 +241,6 @@ string Matrix::getString()
 	}
 	return s;
 }
-
 Matrix Matrix::operator=(const Matrix& m)
 {
 	copy(m);
@@ -603,7 +610,7 @@ complex<double> Matrix::getcDeterminant()
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.cvalues,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.cvalues,p,nRows);
-			 if(result>0 && result<0.01)result=0;
+			 if(std::abs(result)>0.0 && std::abs(result)<0.01)result=0;
 			 return result;
 		 }
 
@@ -866,6 +873,7 @@ Matrix m("complex",nRows, nColumns); //cofactor matrix
  if (nRows != nColumns) //inverse can only be done on square matrices
 	 throw("Invalid Matrix Dimension");
  Matrix n=*this;
+ Matrix m(nRows, nColumns); //cofactor matrix
  double det_value = n.getDeterminant(); //determinant value of the matrix
 
  if (det_value==0.0)
@@ -875,8 +883,6 @@ Matrix m("complex",nRows, nColumns); //cofactor matrix
 		return m;
 	}
 
-
- Matrix m(nRows, nColumns); //cofactor matrix
  int sign_c =1;
  int sign_r=1;
 
@@ -1570,4 +1576,3 @@ Matrix::Matrix(string type,int nRows, int nColumns, int initialization, complex<
 	}
    }
 }
-
