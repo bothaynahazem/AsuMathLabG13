@@ -93,6 +93,7 @@ Matrix::Matrix(string s)
 {
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues = NULL;
 	copy(s);
 }
 
@@ -100,6 +101,7 @@ Matrix::Matrix(double d)
 {
 	nRows = nColumns = 0;
 	values = NULL;
+	cvalues = NULL;
 	copy(d);
 }
 
@@ -157,45 +159,89 @@ void Matrix::copy(double d)
     }
 }
 
+
 void Matrix::copy(string s)
 {
-	reset();
-
-	char* buffer = new char[s.length() + 1];
-	strncpy(buffer, s.c_str(), s.length() + 1); //copying the input string to a buffer because strtok will destruct it.
-
-	const char* lineSeparators = ";\r\n"; //separators used to indicate a ln has been terminated
-	char* line = strtok(buffer, lineSeparators); //tokenizes the first ln
-     	char* Remainlines = strtok(NULL, ""); //tokenizes the remaining lns
-
-	while (line) //line here is my token
+	if (s.find('i') != -1 || s.find('I') != -1)
 	{
-		Matrix row; //empty matrix
-	        const char* separators = " []"; //row separator is space
-						//while [] are used for the first and last rows only (as they have to be removed)
-		char* token = strtok(line, separators); //tokenizes the line into numbers (still in a string form)
+		reset();
+		values = NULL;
+		char* buffer = new char[s.length() + 1];
+		strncpy(buffer, s.c_str(), s.length() + 1); //copying the input string to a buffer because strtok will destruct it.
 
-		while (token) //the token here is the ln I'm extracting numbers from
+		const char* lineSeparators = ";\r\n"; //separators used to indicate a ln has been terminated
+		char* line = strtok(buffer, lineSeparators); //tokenizes the first ln
+		char* Remainlines = strtok(NULL, ""); //tokenizes the remaining lns
+
+		while (line) //line here is my token
 		{
-			const double token_value=atof(token); //converts the tokens into doubles
+			Matrix row; //empty matrix
+			row.type = type;
+			const char* separators = " []"; //row separator is space
+											//while [] are used for the first and last rows only (as they have to be removed)
+			char* token = strtok(line, separators); //tokenizes the line into numbers (still in a string form)
 
-			Matrix item;
-			item = (const double)token_value; //filling the matrix with numbers
-			row.addColumn(item); //add each item in its correct column in the (row) matrix
+			while (token) //the token here is the ln I'm extracting numbers from
+			{
+				const complex<double> token_value = complex_parser(token); //converts the tokens into doubles
 
-			token = strtok(NULL, separators); //gets the next token (or number in our case)
+				Matrix item;
+				item = (const complex<double>)token_value; //filling the matrix with numbers
+				row.addColumn(item); //add each item in its correct column in the (row) matrix
 
+				token = strtok(NULL, separators); //gets the next token (or number in our case)
+
+			}
+
+			if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
+				addRow(row); //add this row to "this"
+
+			line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
+			Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
 		}
 
-		if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
-			addRow(row); //add this row to "this"
-
-	        line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
-        	Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
+		delete[] buffer;
 	}
+	else {
+		reset();
 
-	delete[] buffer;
+		char* buffer = new char[s.length() + 1];
+		strncpy(buffer, s.c_str(), s.length() + 1); //copying the input string to a buffer because strtok will destruct it.
+
+		const char* lineSeparators = ";\r\n"; //separators used to indicate a ln has been terminated
+		char* line = strtok(buffer, lineSeparators); //tokenizes the first ln
+		char* Remainlines = strtok(NULL, ""); //tokenizes the remaining lns
+
+		while (line) //line here is my token
+		{
+			Matrix row; //empty matrix
+			const char* separators = " []"; //row separator is space
+											//while [] are used for the first and last rows only (as they have to be removed)
+			char* token = strtok(line, separators); //tokenizes the line into numbers (still in a string form)
+
+			while (token) //the token here is the ln I'm extracting numbers from
+			{
+				const double token_value = atof(token); //converts the tokens into doubles
+
+				Matrix item;
+				item = (const double)token_value; //filling the matrix with numbers
+				row.addColumn(item); //add each item in its correct column in the (row) matrix
+
+				token = strtok(NULL, separators); //gets the next token (or number in our case)
+
+			}
+
+			if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
+				addRow(row); //add this row to "this"
+
+			line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
+			Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
+		}
+
+		delete[] buffer;
+	}
 }
+
 
 void Matrix::reset()
 {   if(type=="complex")
@@ -1489,6 +1535,11 @@ complex<double> Matrix::complex_parser(const string cs){
 					I=1;
 					else if(x[0]=='-')
                     I=-1;
+					else
+					{
+						x = x.substr(0, 1);
+						I = atof(x.c_str());
+					}
 				}
                 else if(x.find('i')==0)I=1;
 				else {
@@ -1502,6 +1553,11 @@ complex<double> Matrix::complex_parser(const string cs){
 					I=1;
 					else if(x[0]=='-')
                     I=-1;
+					else
+					{
+						x = x.substr(0, 1);
+						I = atof(x.c_str());
+					}
 				}
 				else if(x.find('I')==0)I=1;
 				else {
@@ -1514,14 +1570,14 @@ complex<double> Matrix::complex_parser(const string cs){
 			return c;
 }
 
-Matrix::Matrix(const string type,const string s)
+/*Matrix::Matrix(const string type,const string s)
 {
 	nRows = nColumns = 0;
 	cvalues = NULL;
 	this->type=type;
 	copy(type,s);
-}
-void Matrix::copy(string type,string s)
+}*/
+/*void Matrix::copy(string type,string s)
 {
 reset();
 values=NULL;
@@ -1560,7 +1616,7 @@ values=NULL;
 	}
 
 	delete[] buffer;
-}
+}*/
 Matrix::Matrix(complex<double> d)
 {
 	nRows = nColumns = 0;
