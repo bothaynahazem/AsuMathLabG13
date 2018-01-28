@@ -260,6 +260,28 @@ string Matrix::getString()
 	return s;
 }
 
+string Matrix::getAltString()
+{
+    string s="[";
+    for (int iR=0;iR<nRows;iR++)
+    {
+        for (int iC=0;iC<nColumns;iC++)
+        {
+            char buffer[50]="";
+            if(iC<nColumns-1)
+            snprintf(buffer,50,"%g ", values[iR][iC]);
+            else
+                 snprintf(buffer,50,"%g", values[iR][iC]);
+            s+= buffer;
+        }
+        if(iR < nRows-1)
+        s+= ';';
+        else
+        s+=']';
+    }
+    return s;
+}
+
 Matrix Matrix::operator=(const Matrix& m)
 {
 	copy(m);
