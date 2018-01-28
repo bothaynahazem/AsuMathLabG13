@@ -35,6 +35,7 @@ public:
 	Matrix(string type,int nRows, int nColumns, int initialization=MI_ZEROS, complex<double> initializationValue=0);
 	Matrix(int nRows, int nColumns, double first, ...);
 	Matrix(Matrix& m);
+	Matrix(const Matrix& m);
 	Matrix(double d);
 	Matrix(complex<double> d);
 	Matrix(const string s);
@@ -50,6 +51,7 @@ public:
 
 	string getString();
   string getAltString();
+  string getAltStringNoB();
 	/*operations*/
 	void add(const Matrix& m);
 	void sub(const Matrix& m);
@@ -314,8 +316,9 @@ example:
 	{
 		return nColumns;
 	};
-	string getAltStringNoB();
-	Matrix getDeterminant();
+
+	double getDeterminant();
+	double getdDeterminant();
 	Matrix getTranspose();
 	Matrix getInverse();
 	Matrix div(Matrix &m);
@@ -341,7 +344,5 @@ example:
     static Matrix ceil(Matrix&s);
     static Matrix floor(Matrix&s);
     static complex<double> complex_parser(const string cs);
-		complex<double> solvedeterminant();
-		double getdDeterminant();
-
+	complex<double> getcDeterminant();
 };
