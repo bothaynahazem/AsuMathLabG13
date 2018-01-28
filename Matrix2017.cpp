@@ -88,7 +88,13 @@ Matrix::Matrix(Matrix& m)
 	cvalues=NULL;
 	copy(m);
 }
-
+Matrix::Matrix(const Matrix& m)
+{
+	nRows = nColumns = 0;
+	values = NULL;
+	cvalues=NULL;
+	copy(m);
+}
 Matrix::Matrix(string s)
 {
 	nRows = nColumns = 0;
@@ -248,6 +254,7 @@ if(row.nColumns!=this->nColumns)
 	}
 }
 
+
 void Matrix::reset()
 {   if(type=="complex")
    {
@@ -332,7 +339,32 @@ string Matrix::getAltString()
     }
     return s;
 }
-
+string Matrix::getAltStringNoB()
+{
+    string s="";
+    for (int iR=0;iR<nRows;iR++)
+    {
+        for (int iC=0;iC<nColumns;iC++)
+        {
+            char buffer[50]="";
+            if(iC<nColumns-1)
+            snprintf(buffer,50,"%g ", values[iR][iC]);
+            else
+                 snprintf(buffer,50,"%g", values[iR][iC]);
+            s+= buffer;
+        }
+        if(iR < nRows-1)
+        s+= ';';
+//        else
+//        s+=']';
+    }
+    return s;
+}
+Matrix Matrix::operator=(const Matrix& m)
+{
+	copy(m);
+	return *this;
+}
 
 Matrix Matrix::operator=(const double d) { copy(d);return *this; }
 Matrix Matrix::operator=(string s) { copy(s);return *this; }
@@ -678,41 +710,49 @@ Matrix Matrix::getCofactor(int r, int c)
         }
 }
 //return the determinant of the matrix.
-complex<double> Matrix::solvedeterminant(){
-	if (nRows != nColumns)
-		throw("Invalid matrix dimension");
-	if (nRows == 1 && nColumns == 1)return cvalues[0][0];
-	complex<double> value = 0;
-	double m = 1.0;
-	for (int iR = 0;iR<nRows;iR++)
-	{
-		value += m * cvalues[0][iR] * getCofactor(0, iR).solvedeterminant();
-		m *= -1;
-	}
-	return value;
-}
-
-
-
-Matrix Matrix::getDeterminant()
+double Matrix::getDeterminant()
 {
-	Matrix out(1,1);
-		if(type=="complex"){
-	//valid only when rows=columns.
-	out=solvedeterminant();
-}
-else{
 	double result=0;
 	int *p = new int [nRows+1];
 		Matrix copy = *this;
 		 if(LUPDecompose(copy.values,nRows,0.001,p)){
 			 result= LUPDeterminant(copy.values,p,nRows);
 			if(result>0 && result<0.01)result=0;
+			 return result;
 		 }
-		 out=result;
 }
 
-return out;   //return;
+complex<double> Matrix::getcDeterminant()
+{
+	//valid only when rows=columns.
+if (nRows != nColumns)
+	throw("Invalid matrix dimension");
+if (nRows == 1 && nColumns == 1)return cvalues[0][0];
+complex<double> value = 0;
+double m = 1.0;
+for (int iR = 0;iR<nRows;iR++)
+{
+	value += m * cvalues[0][iR] * getCofactor(0, iR).getcDeterminant();
+	m *= -1;
+}
+return value;   //return;
+
+}
+
+double Matrix::getdDeterminant()
+{
+    //valid only when rows=columns.
+if (nRows != nColumns)
+    throw("Invalid matrix dimension");
+if (nRows == 1 && nColumns == 1)return values[0][0];
+double value = 0;
+double m = 1.0;
+for (int iR = 0;iR<nRows;iR++)
+{
+    value += m * values[0][iR] * getCofactor(0, iR).getdDeterminant();
+    m *= -1;
+}
+return value;
 }
 
 /* INPUT: A - array of pointers to rows of a square matrix having dimension N
@@ -940,14 +980,14 @@ Matrix Matrix::getInverse() //inverse=(1/determinant)*transpose of cofactor matr
 		throw("Invalid Matrix Dimension");
 	Matrix n=*this;
 Matrix m("complex",nRows, nColumns); //cofactor matrix
-	Matrix value;
-	value=n.getDeterminant(); //determinant value of the matrix
-	complex<double> det_value=value.cvalues[0][0];
+	complex<double> det_value = n.getcDeterminant(); //determinant value of the matrix
+
 	if (det_value==0.0)
         {
 		Matrix s("complex",nRows,nColumns,MI_VALUE,NAN);
 		return s;
 	}
+
 
 	double sign_c =1;
 	double sign_r=1;
@@ -957,7 +997,7 @@ Matrix m("complex",nRows, nColumns); //cofactor matrix
         sign_c=sign_r;
 		for (int iC = 0;iC<m.nColumns;iC++)
 		{
-			m.cvalues[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant().cvalues[0][0];//getting detreminant values of cofactor matrix
+			m.cvalues[iR][iC] = sign_c * n.getCofactor(iR, iC).getcDeterminant();//getting detreminant values of cofactor matrix
 			sign_c *=-1;//following sign rule in matrices
 		}
         sign_r*=-1;
@@ -973,9 +1013,8 @@ Matrix m("complex",nRows, nColumns); //cofactor matrix
 	 throw("Invalid Matrix Dimension");
  Matrix n=*this;
  Matrix m(nRows, nColumns); //cofactor matrix
-  Matrix value;
-	value= n.getDeterminant(); //determinant value of the matrix
-double det_value=value.values[0][0];
+ double det_value = n.getDeterminant(); //determinant value of the matrix
+
  if (det_value==0.0)
         {
 		Matrix s(nRows,nColumns,MI_VALUE,NAN);
@@ -990,7 +1029,7 @@ double det_value=value.values[0][0];
 			 sign_c=sign_r;
 	 for (int iC = 0;iC<m.nColumns;iC++)
 	 {
-		 m.values[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant().values[0][0];//getting detreminant values of cofactor matrix
+		 m.values[iR][iC] = sign_c * n.getCofactor(iR, iC).getDeterminant();//getting detreminant values of cofactor matrix
 		 sign_c *=-1;//following sign rule in matrices
 	 }
 			 sign_r*=-1;
@@ -1688,46 +1727,4 @@ Matrix::Matrix(string type,int nRows, int nColumns, int initialization, complex<
 		}
 	}
    }
-}
-double Matrix::getdDeterminant()
-{
-    //valid only when rows=columns.
-if (nRows != nColumns)
-    throw("Invalid matrix dimension");
-if (nRows == 1 && nColumns == 1)return values[0][0];
-double value = 0;
-double m = 1.0;
-for (int iR = 0;iR<nRows;iR++)
-{
-    value += m * values[0][iR] * getCofactor(0, iR).getdDeterminant();
-    m *= -1;
-}
-return value;
-}
-
-string Matrix::getAltStringNoB()
-{
-    string s="";
-    for (int iR=0;iR<nRows;iR++)
-    {
-        for (int iC=0;iC<nColumns;iC++)
-        {
-            char buffer[50]="";
-            if(iC<nColumns-1)
-            snprintf(buffer,50,"%g ", values[iR][iC]);
-            else
-                 snprintf(buffer,50,"%g", values[iR][iC]);
-            s+= buffer;
-        }
-        if(iR < nRows-1)
-        s+= ';';
-//        else
-//        s+=']';
-    }
-    return s;
-}
-Matrix Matrix::operator=(const Matrix& m)
-{
-	copy(m);
-	return *this;
 }
