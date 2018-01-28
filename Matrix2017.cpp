@@ -195,7 +195,10 @@ void Matrix::copy(string s)
 
 			if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
 				addRow(row); //add this row to "this"
-
+if(row.nColumns!=this->nColumns)
+    {
+        throw("Invalid Matrix Dimensions");
+    }
 			line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
 			Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
 		}
@@ -233,7 +236,10 @@ void Matrix::copy(string s)
 
 			if ((row.nColumns>0) && (row.nColumns == nColumns || nRows == 0)) //if there were no rows before in the "this" matrix
 				addRow(row); //add this row to "this"
-
+if(row.nColumns!=this->nColumns)
+    {
+        throw("Invalid Matrix Dimensions");
+    }
 			line = strtok(Remainlines, lineSeparators); //tokenizing the next ln
 			Remainlines = strtok(NULL, ""); //tokenizing the ln next to it
 		}
@@ -327,7 +333,27 @@ string Matrix::getAltString()
     }
     return s;
 }
-
+string Matrix::getAltStringNoB()
+{
+    string s="";
+    for (int iR=0;iR<nRows;iR++)
+    {
+        for (int iC=0;iC<nColumns;iC++)
+        {
+            char buffer[50]="";
+            if(iC<nColumns-1)
+            snprintf(buffer,50,"%g ", values[iR][iC]);
+            else
+                 snprintf(buffer,50,"%g", values[iR][iC]);
+            s+= buffer;
+        }
+        if(iR < nRows-1)
+        s+= ';';
+//        else
+//        s+=']';
+    }
+    return s;
+}
 Matrix Matrix::operator=(const Matrix& m)
 {
 	copy(m);
