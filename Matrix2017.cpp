@@ -234,10 +234,21 @@ string Matrix::getString()
 				if (cvalues[iR][iC].imag()==0)
 					snprintf(buffer, 50, "%g\t", cvalues[iR][iC].real());
 				else if (cvalues[iR][iC].real()==0)
-					snprintf(buffer, 50, "%gi\t", cvalues[iR][iC].imag());
+								if(cvalues[iR][iC].imag()==1)
+									snprintf(buffer, 50, "i\t");
+								else if(cvalues[iR][iC].imag()==-1)
+										snprintf(buffer, 50, "-i\t");
+								else
+									snprintf(buffer, 50, "%gi\t", cvalues[iR][iC].imag());
 				else if (cvalues[iR][iC].real()!=0 && cvalues[iR][iC].imag()<0)
-					snprintf(buffer, 50, "%g%gi\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
+							 if(cvalues[iR][iC].imag()==-1)
+									snprintf(buffer, 50, "%g-i\t", cvalues[iR][iC].real());
+						   else
+							 snprintf(buffer, 50, "%g%gi\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
 				else
+				 if(cvalues[iR][iC].imag()==1)
+					snprintf(buffer, 50, "%g+i\t", cvalues[iR][iC].real());
+				 else
 					snprintf(buffer, 50, "%g+%gi\t", cvalues[iR][iC].real(),cvalues[iR][iC].imag());
       }else
 			snprintf(buffer, 50, "%g\t", values[iR][iC]);
@@ -248,6 +259,7 @@ string Matrix::getString()
 	}
 	return s;
 }
+
 Matrix Matrix::operator=(const Matrix& m)
 {
 	copy(m);
