@@ -851,9 +851,8 @@ Matrix m("complex",nRows, nColumns); //cofactor matrix
 
 	if (det_value==0.0)
         {
-		double x=NAN;
-		m=x;
-		return m;
+		Matrix s("complex",nRows,nColumns,MI_VALUE,NAN);
+		return s;
 	}
 
 
@@ -885,9 +884,8 @@ Matrix m("complex",nRows, nColumns); //cofactor matrix
 
  if (det_value==0.0)
         {
-		double x=NAN;
-		m=x;
-		return m;
+		Matrix s(nRows,nColumns,MI_VALUE,NAN);
+		return s;
 	}
 
  int sign_c =1;
