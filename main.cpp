@@ -309,34 +309,265 @@ bool isLetter(string s)
         return false;
 }
 
-bool isChar(string s)
-{
-	//if (s.size() >1) return false;
 
-	switch (s[0]) {
-	case '+': return true;
-	case '-': return true;
-	case '*': return true;
-	case '/': return true;
-	case '(': return true;
-	case ')': return true;
-	case '^': return true;
-	case '.': if(s[1]=='+') return true;
-	else if(s[1]=='-') return true;
-    else if(s[1]=='*') return true;
-    else if(s[1]=='/') return true;
-    else if(s[1]=='^') return true;
-	default: return false;
+Matrix solve(Matrix op1,Matrix op2, string ch)
+{
+    Matrix X;
+	switch (ch[0])
+	{
+	case '+':
+	    X = op1+op2;
+	     return X;
+	case '-': X = op1-op2;
+	     return X;
+	case '*': X = op1*op2;
+	     return X;
+	case '/': if(op2.getn()!=1) X = op1.div(op2);
+              else X = op1/op2.getdDeterminant();
+         return X;
+	case '^': if (op2.getn()==1 && op1.getn()==1)
+        X = pow(op1.getDeterminant(),op2.getDeterminant());
+        else if(op2.getn()==1)
+	    X = Matrix::pow(op1,op2.getDeterminant());
+	    return X;
+    case '.': if(ch[1]=='+') X = op1+op2.getDeterminant();
+	else if(ch[1]=='-') X = op1-op2.getDeterminant();
+    else if(ch[1]=='*') X = op1*op2.getDeterminant();
+    else if(ch[1]=='/')if(op2.getn()==1) X = op1/op2.getDeterminant();
+                        else if(op1.getn()==1) X = op1.rdivide(op1.getDeterminant(),op2);
+                        else X = op1.rdivide(op1,op2);
+    else if(ch[1]=='^') if (op2.getn()==1)
+        X = Matrix::rpow(op1,op2.getDeterminant());
+    return X;
+
 	}
 }
 
-bool isLetter(string s)
+int preference(string ch)
 {
-    if (s[0]>='A' && s[0]<='Z')
-        return true;
-    else
-        return false;
+	switch (ch[0])
+	{
+	case '+': return 1;
+	case '-': return 1;
+	case '*': return 2;
+	case '/': return 2;
+	case '^': return 3;
+	case '(': return -1;
+	case '.': if(ch[1]=='+') return 1;
+	else if(ch[1]=='-') return 1;
+    else if(ch[1]=='*') return 2;
+    else if(ch[1]=='/') return 2;
+    else if(ch[1]=='^') return 3;
+	}
 }
+
+string evaluate(string s1)
+{
+	stack<string> operators;
+	stack<Matrix> operands;
+	string result;
+	string s;
+for (int i=0; i<s1.length();i++)
+    if (s1[i]==' ')
+    s1.erase(i,1);
+	if(s1[0]=='-')
+        s1.insert(0,"0");
+    for (int i=0; i<s1.length();i++)
+    if(s1[i]==' '&& s1[i+1] == '-')
+        s1.insert(i+1,"0");
+    else if(s1[i]=='('&& s1[i+1]=='-')
+        s1.insert(i+1,"0");
+
+	int pos = 0;
+        while (pos != string::npos)
+	{
+		pos = s1.find_first_of("()+-/*^", pos);
+		if (pos == -1) break;
+		if (s1[pos - 1] == '.')
+		{
+			s1.insert(pos-1, " ");
+			s1.insert(pos + 2, " ");
+		}
+		else
+		{
+            s1.insert(pos, " ");
+            s1.insert(pos + 2, " ");
+		}
+		pos = s1.find_first_of("()+-/*^", pos) + 1;
+	}
+
+	if (s1.find("sin") != string::npos )
+    {
+
+			int pos = 0;
+			while (pos != string::npos)
+			{
+				pos = s1.find("sin");
+				if (pos == -1) break;
+				pos += 3;
+				s1 = replaceSin(s1);
+			}
+		}
+
+    if (s1.find("cos") != string::npos)
+	{
+
+		int pos = 0;
+		while (pos != string::npos)
+		{
+			pos = s1.find("cos");
+			if (pos == -1) break;
+			pos += 3;
+			s1 = replaceCos(s1);
+		}
+	}
+
+	if (s1.find("tan") != string::npos)
+	{
+
+		int pos = 0;
+		while (pos != string::npos)
+		{
+			pos = s1.find("tan");
+			if (pos == -1) break;
+			pos += 3;
+			s1 = replaceTan(s1);
+		}
+	}
+
+	if (s1.find("log10") != string::npos)
+	{
+
+		int pos = 0;
+		while (pos != string::npos)
+		{
+			pos = s1.find("log10");
+			if (pos == -1) break;
+			pos += 3;
+			s1 = replaceLog(s1);
+		}
+	}
+
+
+	if (s1.find("log") != string::npos)
+	{
+
+		int pos = 0;
+		while (pos != string::npos)
+		{
+			pos = s1.find("log");
+			if (pos == -1) break;
+			pos += 3;
+			s1 = replaceLn(s1);
+		}
+	}
+
+	if (s1.find("exp") != string::npos)
+	{
+
+		int pos = 0;
+		while (pos != string::npos)
+		{
+			pos = s1.find("exp");
+			if (pos == -1) break;
+			pos += 3;
+			s1 = replaceExp(s1);
+		}
+	}
+
+    if (s1.find("sqrt") != string::npos)
+	{
+
+		int pos = 0;
+		while (pos != string::npos)
+		{
+			pos = s1.find("sqrt");
+			if (pos == -1) break;
+			pos += 3;
+			s1 = replaceSqrt(s1);
+		}
+	}
+
+	if (s1.find("Math error") != string::npos)
+		return "Math error";
+
+
+
+	istringstream is(s1);
+	while (is >> s)
+	{
+		if (isChar(s))
+		{
+			if (s[0] == '(') operators.push("(");
+			else if (s[0] == ')')
+			{
+				while (operators.top() != "(")
+				{
+					string ch = operators.top(); operators.pop();
+					Matrix op2 = operands.top(); operands.pop();
+					Matrix op1 = operands.top(); operands.pop();
+                    Matrix H(solve(op1, op2, ch));
+					operands.push(H);
+				}
+				operators.pop();
+			}
+			else
+			{
+				while (!operators.empty() && preference(s) <= preference(operators.top()))
+				{
+
+					string ch = operators.top(); operators.pop();
+					Matrix op2 = operands.top(); operands.pop();
+					Matrix op1 = operands.top(); operands.pop();
+
+					operands.push(solve(op1, op2, ch));
+
+				}
+
+				operators.push(s);
+			}
+
+		}
+		else if(isLetter(s))
+        {
+            for (int i=0;i<100;i++)
+            {
+                if(variables_names[i]==s)
+                {
+                    Matrix H(input_matrices[i]);
+                    operands.push(H);
+                    break;
+                }
+            }
+        }
+		else
+		{
+			Matrix op(s);
+			operands.push(op);
+		}
+
+	}
+
+	while (!operators.empty())
+	{
+		string ch = operators.top(); operators.pop();
+		Matrix op2 = operands.top(); operands.pop();
+		Matrix op1 = operands.top(); operands.pop();
+
+		operands.push(solve(op1, op2, ch));
+	}
+
+//	char buffer[1000];
+//	sprintf(buffer, "%f", operands.top().getDeterminate());
+if(operands.top().getn()!=1)
+	result = operands.top().getAltString();
+	else
+        result = operands.top().getAltStringNoB();
+
+	return result;
+}
+
+
 
 
 
