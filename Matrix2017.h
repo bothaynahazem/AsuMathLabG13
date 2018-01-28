@@ -50,7 +50,6 @@ public:
 
 	string getString();
   string getAltString();
-  string getAltStringNoB();
 	/*operations*/
 	void add(const Matrix& m);
 	void sub(const Matrix& m);
@@ -315,9 +314,8 @@ example:
 	{
 		return nColumns;
 	};
-
-	double getDeterminant();
-	double getdDeterminant();
+	string getAltStringNoB();
+	Matrix getDeterminant();
 	Matrix getTranspose();
 	Matrix getInverse();
 	Matrix div(Matrix &m);
@@ -343,5 +341,7 @@ example:
     static Matrix ceil(Matrix&s);
     static Matrix floor(Matrix&s);
     static complex<double> complex_parser(const string cs);
-	complex<double> getcDeterminant();
+		complex<double> solvedeterminant();
+		double getdDeterminant();
+
 };
