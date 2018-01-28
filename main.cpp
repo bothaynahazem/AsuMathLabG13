@@ -9,9 +9,305 @@
 enum MI { MI_ZEROS, MI_ONES, MI_EYE, MI_RAND, MI_VALUE };
 using namespace std;
 
+
 Matrix* input_matrices= new Matrix[100];// array to hold matrices values
 string* variables_names=new string[100];// array to hold matrices variable character
 int in_cntr=0;
+string evaluate(string s1);
+
+int countcommas(string x){
+        string s = x;
+        int commas=0;
+        for(int i=0; i<s.length();i++){
+            if(s[i]==','){
+                commas++;
+            }
+
+        }
+        return commas;
+}
+void addcomma(string& z){
+    for(int j=0; j<z.length()-1;j++){
+        if(z[j]==']'){
+            int open=z.find_first_of('[',j);
+            string str=z.substr(j+1,open-j-1);
+            if(str.find_first_not_of(' ') != std::string::npos){
+
+            }
+            else{
+                z.replace(j,1,"],");
+            }
+        }
+    }
+}
+string concatenate (string s){
+
+        string z =s;
+        addcomma(z);
+        Matrix matarr[2];
+        int commapos,closedbracket,openedbracket;
+        string tempconstruct;
+        while (z.find(',') != string::npos)
+        {
+        commapos = z.find(',', 0);
+        openedbracket=z.find_last_of('[',commapos);
+        closedbracket=z.find_last_of(']',commapos);
+        tempconstruct=z.substr(openedbracket, closedbracket - openedbracket+1);
+        z.replace(openedbracket, closedbracket - openedbracket+1," ");
+        matarr[0]=Matrix(tempconstruct);
+        commapos = z.find(',', 0);
+        openedbracket=z.find_first_of('[',commapos);
+        closedbracket=z.find_first_of(']',commapos);
+        tempconstruct=z.substr(openedbracket, closedbracket - openedbracket+1);
+        z.replace(openedbracket, closedbracket - openedbracket+1," ");
+        matarr[1]=Matrix(tempconstruct);
+        matarr[0].addColumn(matarr[1]);
+        string y = matarr[0].getAltString();
+        z.replace(commapos,1,y);
+        }
+        return z;
+        }
+
+
+string replaceSin(string s)
+{
+	if (s.find("sin")!=string::npos)
+	{
+	    string mat_name ="ST";
+		int begin = s.find('(', s.find("sin"));
+		int end = s.find(')', begin+1);
+		string x1 = s.substr(begin+1 , end-begin-1);
+		int lengthOfSin = x1.length()+5;
+		int start = (s.find("sin"));
+		Matrix Y(evaluate(x1));
+		Matrix x(Matrix::sin(Y));
+//		char buffer[100];
+//		sprintf(buffer, "%f", x);
+//		string xstr = buffer;
+        if(x.getn()==1)
+		s.replace(start, lengthOfSin+1, x.getAltString());
+		else
+        {
+            variables_names[in_cntr] = mat_name;
+            mat_name+="X";
+            input_matrices[in_cntr] = x;
+            s.replace(start, lengthOfSin+1, variables_names[in_cntr]);
+            in_cntr++;
+        }
+        return s;
+	}
+	return NULL;
+}
+string replaceCos(string s)
+{
+	if (s.find("cos") != string::npos)
+	{
+	    string mat_name ="CT";
+		int begin = s.find('(', s.find("cos"));
+		int end = s.find(')', begin+1);
+		string x1 = s.substr(begin+1 , end-begin-1);
+		int lengthOfCos = x1.length()+5;
+		int start = (s.find("cos"));
+		Matrix Y(evaluate(x1));
+		Matrix x(Matrix::cos(Y));
+//		char buffer[100];
+//		sprintf(buffer, "%f", x);
+//		string xstr = buffer;
+        if(x.getn()==1)
+		s.replace(start, lengthOfCos+1, x.getAltString());
+		else
+        {
+            variables_names[in_cntr] = mat_name;
+            mat_name+="X";
+            input_matrices[in_cntr] = x;
+            s.replace(start, lengthOfCos+1, variables_names[in_cntr]);
+            in_cntr++;
+        }
+        return s;
+	}
+	 return NULL;
+}
+
+string replaceTan(string s)
+{
+	if (s.find("tan") != string::npos)
+	{
+	    string mat_name ="TT";
+		int begin = s.find('(', s.find("tan"));
+		int end = s.find(')', begin+1);
+		string x1 = s.substr(begin+1 , end-begin-1);
+		int lengthOfTan = x1.length()+5;
+		int start = (s.find("tan"));
+		Matrix Y(evaluate(x1));
+		Matrix x(Matrix::tan(Y));
+//		char buffer[100];
+//		sprintf(buffer, "%f", x);
+//		string xstr = buffer;
+        if(x.getn()==1)
+		s.replace(start, lengthOfTan+1, x.getAltString());
+		else
+        {
+            variables_names[in_cntr] = mat_name;
+            mat_name+="X";
+            input_matrices[in_cntr] = x;
+            s.replace(start, lengthOfTan+1, variables_names[in_cntr]);
+            in_cntr++;
+        }
+        return s;
+	}
+	 return NULL;
+}
+string replaceLog(string s)
+{
+	if (s.find("log10") != string::npos)
+{
+        string mat_name ="LT";
+		int begin = s.find('(', s.find("log10"));
+		int end = s.find(')', begin+1);
+		string x1 = s.substr(begin+1 , end-begin-1);
+		int lengthOfLog10 = x1.length()+7;
+		int start = (s.find("log10"));
+		Matrix Y(evaluate(x1));
+		Matrix x(Matrix::log10(Y));
+//		char buffer[100];
+//		sprintf(buffer, "%f", x);
+//		string xstr = buffer;
+        if(x.getn()==1)
+		s.replace(start, lengthOfLog10+1, x.getAltString());
+		else
+        {
+            variables_names[in_cntr] = mat_name;
+            mat_name+="X";
+            input_matrices[in_cntr] = x;
+            s.replace(start, lengthOfLog10+1, variables_names[in_cntr]);
+            in_cntr++;
+        }
+        return s;
+}
+	return NULL;
+}
+
+
+string replaceLn(string s)
+{
+	if (s.find("log") != string::npos)
+    {
+	    string mat_name ="LLT";
+		int begin = s.find('(', s.find("log"));
+		int end = s.find(')', begin+1);
+		string x1 = s.substr(begin+1 , end-begin-1);
+		int lengthOfLn = x1.length()+5;
+		int start = (s.find("tan"));
+		Matrix Y(evaluate(x1));
+		Matrix x(Matrix::log(Y));
+//		char buffer[100];
+//		sprintf(buffer, "%f", x);
+//		string xstr = buffer;
+        if(x.getn()==1)
+		s.replace(start, lengthOfLn+1, x.getAltString());
+		else
+        {
+            variables_names[in_cntr] = mat_name;
+            mat_name+="X";
+            input_matrices[in_cntr] = x;
+            s.replace(start, lengthOfLn+1, variables_names[in_cntr]);
+            in_cntr++;
+        }
+        return s;
+	}
+	return NULL;
+}
+
+
+string replaceExp(string s)
+{
+	if (s.find("exp") != string::npos)
+	{
+	    string mat_name ="ET";
+		int begin = s.find('(', s.find("exp"));
+		int end = s.find(')', begin+1);
+		string x1 = s.substr(begin+1 , end-begin-1);
+		int lengthOfExp = x1.length()+5;
+		int start = (s.find("exp"));
+		Matrix Y(evaluate(x1));
+		Matrix x(Matrix::exp(Y));
+//		char buffer[100];
+//		sprintf(buffer, "%f", x);
+//		string xstr = buffer;
+        if(x.getn()==1)
+		s.replace(start, lengthOfExp+1, x.getAltString());
+		else
+        {
+            variables_names[in_cntr] = mat_name;
+            mat_name+="X";
+            input_matrices[in_cntr] = x;
+            s.replace(start, lengthOfExp+1, variables_names[in_cntr]);
+            in_cntr++;
+        }
+        return s;
+	}
+	return NULL;
+}
+
+string replaceSqrt(string s)
+{
+	if (s.find("sqrt") != string::npos)
+	{
+	    string mat_name ="SST";
+		int begin = s.find('(', s.find("sqrt"));
+		int end = s.find(')', begin+1);
+		string x1 = s.substr(begin+1 , end-begin-1);
+		int lengthOfSqrt = x1.length()+6;
+		int start = (s.find("sqrt"));
+		Matrix Y(evaluate(x1));
+		Matrix x(Matrix::sqrt(Y));
+//		char buffer[100];
+//		sprintf(buffer, "%f", x);
+//		string xstr = buffer;
+        if(x.getn()==1)
+		s.replace(start, lengthOfSqrt+1, x.getAltString());
+		else
+        {
+            variables_names[in_cntr] = mat_name;
+            mat_name+="X";
+            input_matrices[in_cntr] = x;
+            s.replace(start, lengthOfSqrt+1, variables_names[in_cntr]);
+            in_cntr++;
+        }
+        return s;
+	}
+	return NULL;
+}
+
+
+bool isChar(string s)
+{
+	//if (s.size() >1) return false;
+
+	switch (s[0]) {
+	case '+': return true;
+	case '-': return true;
+	case '*': return true;
+	case '/': return true;
+	case '(': return true;
+	case ')': return true;
+	case '^': return true;
+	case '.': if(s[1]=='+') return true;
+	else if(s[1]=='-') return true;
+    else if(s[1]=='*') return true;
+    else if(s[1]=='/') return true;
+    else if(s[1]=='^') return true;
+	default: return false;
+	}
+}
+
+bool isLetter(string s)
+{
+    if (s[0]>='A' && s[0]<='Z')
+        return true;
+    else
+        return false;
+}
 
 bool isChar(string s)
 {
