@@ -706,8 +706,8 @@ for (int h=0; h<contents[i].length();h++)
 	else if (contents[i].find("rand", 0) != string::npos)
 	{
 	    matrix_char = contents[i].substr(0,1);
-		int nR = stoi(contents[i].substr(contents[i].find('(', 0) + 1, 1));
-		int nC = stoi(contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1));
+		int nR = atof((contents[i].substr(contents[i].find('(', 0) + 1, 1).c_str()));
+		int nC = atof((contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1)).c_str());
 		Matrix X(nR, nC, MI_RAND,0.0);
 		variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
@@ -716,8 +716,8 @@ for (int h=0; h<contents[i].length();h++)
 	else if (contents[i].find("eye", 0) != string::npos)
 	{
 	    matrix_char = contents[i].substr(0,1);
-		int nR = stoi(contents[i].substr(contents[i].find('(', 0) + 1, 1));
-		int nC = stoi(contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1));
+		int nR = atof((contents[i].substr(contents[i].find('(', 0) + 1, 1).c_str()));
+		int nC = atof((contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1)).c_str());
 		Matrix X(nR, nC, MI_EYE,0.0);
 		variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
@@ -726,8 +726,8 @@ for (int h=0; h<contents[i].length();h++)
 	else if (contents[i].find("zeros", 0) != string::npos)
 	{
 	    matrix_char = contents[i].substr(0,1);
-		int nR = stoi(contents[i].substr(contents[i].find('(', 0) + 1, 1));
-		int nC = stoi(contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1));
+		int nR = atof((contents[i].substr(contents[i].find('(', 0) + 1, 1).c_str()));
+		int nC = atof((contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1)).c_str());
 		Matrix X(nR, nC, MI_ZEROS,0.0);
 		variables_names[in_cntr] = matrix_char;
         input_matrices[in_cntr] = X;
@@ -736,8 +736,8 @@ for (int h=0; h<contents[i].length();h++)
 	else if (contents[i].find("ones", 0) != string::npos)
 	{
 	    matrix_char = contents[i].substr(0,1);
-		int nR = stoi(contents[i].substr(contents[i].find('(', 0) + 1, 1));
-		int nC = stoi(contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1));
+		int nR = atof((contents[i].substr(contents[i].find('(', 0) + 1, 1).c_str()));
+		int nC = atof((contents[i].substr(contents[i].find(',', 0) + 1, contents[i].find(')',0)-contents[i].find(',', 0) + 1)).c_str());
 		Matrix X(nR, nC, MI_ONES,0.0);
 
         variables_names[in_cntr] = matrix_char;
